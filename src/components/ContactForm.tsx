@@ -79,8 +79,22 @@ export default function ContactForm() {
     }
     setErrors({});
     setStatus("loading");
-    await new Promise((r) => setTimeout(r, 1800));
-    setStatus("success");
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error ?? "שגיאת שרת");
+      }
+      setStatus("success");
+    } catch (err) {
+      console.error(err);
+      setStatus("idle");
+      setErrors({ challenge: err instanceof Error ? err.message : "שגיאה בשליחה, נסה שוב" });
+    }
   };
 
   const handleChange = (
