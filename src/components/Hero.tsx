@@ -5,12 +5,9 @@ import {
   ArrowLeft,
   Cpu,
   Layers,
-  GitBranch,
-  Wifi,
   BarChart2,
   CheckCircle2,
   Zap,
-  Settings,
 } from "lucide-react";
 
 /* ── Floating UI Widgets ──────────────────────────────────────────── */
@@ -112,7 +109,7 @@ export default function Hero() {
             <motion.div variants={itemVariants} className="inline-flex items-center gap-2 mb-6">
               <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-semibold rounded-full">
                 <span className="w-1.5 h-1.5 bg-indigo-500 rounded-full inline-block animate-pulse" />
-                פתרונות הנדסיים מתקדמים
+                הנדסה · תכנון · הדפסה תלת-מימד
               </span>
             </motion.div>
 
@@ -140,11 +137,9 @@ export default function Hero() {
               variants={itemVariants}
               className="text-lg sm:text-xl text-slate-500 leading-relaxed mb-10 max-w-xl"
             >
-              מתכננים ומפתחים פתרונות קצה לקצה לחברות הייטק, תעשייה וביטחון.
-              שילוב מנצח של{" "}
-              <strong className="text-slate-700 font-semibold">מכניקה</strong>,{" "}
-              <strong className="text-slate-700 font-semibold">אלקטרוניקה</strong> ו
-              <strong className="text-slate-700 font-semibold">מערכת</strong>.
+              מהרעיון ועד לאב-טיפוס ביד — תכנון הנדסי מלא בשילוב{" "}
+              <strong className="text-slate-700 font-semibold">הדפסת תלת-מימד מקצועית</strong>.
+              פתרונות פשוטים לבעיות מורכבות, לסטארטאפים, יצרנים וממציאים.
             </motion.p>
 
             {/* CTA buttons */}
@@ -211,14 +206,14 @@ export default function Hero() {
                     <div className="w-2.5 h-2.5 rounded-full bg-yellow-400" />
                     <div className="w-2.5 h-2.5 rounded-full bg-green-400" />
                   </div>
-                  <span className="text-xs font-mono text-slate-400">project_dashboard.nbh</span>
+                  <span className="text-xs font-mono text-slate-400">3d_project.nbh</span>
                 </div>
 
                 {/* System status rows */}
                 {[
-                  { label: "מכניקה", pct: 92, color: "bg-indigo-500" },
-                  { label: "אלקטרוניקה", pct: 87, color: "bg-violet-500" },
-                  { label: "מערכת", pct: 95, color: "bg-cyan-500" },
+                  { label: "CAD / תכנון", pct: 96, color: "bg-indigo-500" },
+                  { label: "הדפסת תלת-מימד", pct: 92, color: "bg-violet-500" },
+                  { label: "אב-טיפוס", pct: 88, color: "bg-cyan-500" },
                 ].map((row, i) => (
                   <div key={i} className="space-y-1.5">
                     <div className="flex justify-between text-xs font-medium text-slate-600">
@@ -249,7 +244,7 @@ export default function Hero() {
                       />
                     ))}
                   </div>
-                  <div className="text-center text-xs text-slate-400 mt-2">ביצועי פרויקטים</div>
+                  <div className="text-center text-xs text-slate-400 mt-2">פרויקטים שהושלמו</div>
                 </div>
 
                 <div className="flex items-center gap-2 bg-green-50 rounded-xl px-3 py-2 mt-1">
@@ -274,11 +269,11 @@ export default function Hero() {
                 className="absolute bottom-[-20px] left-[-24px] bg-white rounded-2xl shadow-xl shadow-slate-900/8 border border-slate-100 p-3 flex items-center gap-2.5"
               >
                 <div className="w-8 h-8 rounded-xl bg-violet-50 flex items-center justify-center">
-                  <Wifi className="w-4 h-4 text-violet-600" />
+                  <Layers className="w-4 h-4 text-violet-600" />
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-slate-900">IoT Connected</div>
-                  <div className="text-[10px] text-slate-500">LoRa · RFID · NFC</div>
+                  <div className="text-xs font-bold text-slate-900">3D Printing</div>
+                  <div className="text-[10px] text-slate-500">FDM · SLA · SLS</div>
                 </div>
               </FloatingWidget>
 
@@ -288,11 +283,11 @@ export default function Hero() {
                 className="absolute top-[60px] left-[-70px] bg-white rounded-2xl shadow-xl shadow-slate-900/8 border border-slate-100 p-3 flex items-center gap-2.5"
               >
                 <div className="w-8 h-8 rounded-xl bg-cyan-50 flex items-center justify-center">
-                  <Layers className="w-4 h-4 text-cyan-600" />
+                  <Cpu className="w-4 h-4 text-cyan-600" />
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-slate-900">Full Stack HW</div>
-                  <div className="text-[10px] text-slate-500">מחומרה לתוכנה</div>
+                  <div className="text-xs font-bold text-slate-900">רב-תחומי</div>
+                  <div className="text-[10px] text-slate-500">מכניקה · אלקטרוניקה</div>
                 </div>
               </FloatingWidget>
 
