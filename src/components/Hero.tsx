@@ -70,8 +70,8 @@ export default function Hero() {
               animate="visible"
               className="text-right"
             >
-              {/* Glass card behind text for extra readability */}
-              <div className="bg-black/20 backdrop-blur-sm rounded-3xl p-8 lg:p-10 border border-white/8">
+              {/* Text content */}
+              <div className="rounded-3xl p-8 lg:p-10">
 
                 {/* Badge */}
                 <motion.div variants={itemVariants} className="inline-flex items-center gap-2 mb-7">
@@ -107,7 +107,7 @@ export default function Hero() {
                 {/* Sub-headline */}
                 <motion.p
                   variants={itemVariants}
-                  className="text-lg sm:text-xl text-white/80 leading-relaxed mb-10 max-w-lg"
+                  className="text-lg sm:text-xl text-white leading-relaxed mb-10 max-w-lg"
                   style={{ textShadow: "0 1px 8px rgba(0,0,0,0.7)" }}
                 >
                   מהרעיון ועד לאב-טיפוס ביד — תכנון הנדסי מלא בשילוב{" "}
@@ -164,7 +164,7 @@ export default function Hero() {
                       >
                         {stat.num}
                       </div>
-                      <div className="text-xs text-white/55">{stat.label}</div>
+                      <div className="text-xs text-white">{stat.label}</div>
                     </div>
                   ))}
                 </motion.div>
@@ -181,7 +181,7 @@ export default function Hero() {
         transition={{ delay: 2.4, duration: 0.6 }}
         className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2"
       >
-        <span className="text-[11px] text-white/40 font-medium tracking-wide">גלול למטה</span>
+        <span className="text-[11px] text-white font-medium tracking-wide">גלול למטה</span>
         <motion.div
           animate={{ y: [0, 6, 0] }}
           transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
