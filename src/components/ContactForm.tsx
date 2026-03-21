@@ -1,19 +1,17 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useRef } from "react";
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
 import {
-  Send,
   Phone,
   Mail,
   MapPin,
   MessageSquare,
-  CheckCircle,
-  Loader2,
   Clock,
   Shield,
   Star,
+  ArrowLeft,
 } from "lucide-react";
 
 const contactInfo = [
@@ -46,66 +44,15 @@ const contactInfo = [
 const trustBadges = [
   { icon: Shield, text: "פרוייקטים סודיים מוזמנים" },
   { icon: Star, text: "5 כוכבים בכל הפרויקטים" },
-  { icon: CheckCircle, text: "NDA זמין לחתימה מיידית" },
 ];
+
+function openChatbot() {
+  window.dispatchEvent(new CustomEvent("nbh:open-chatbot"));
+}
 
 export default function ContactForm() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
-
-  const [form, setForm] = useState({
-    name: "",
-    company: "",
-    phone: "",
-    challenge: "",
-  });
-  const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
-  const [errors, setErrors] = useState<Partial<typeof form>>({});
-
-  const validate = () => {
-    const newErrors: Partial<typeof form> = {};
-    if (!form.name.trim()) newErrors.name = "שדה חובה";
-    if (!form.phone.trim()) newErrors.phone = "שדה חובה";
-    if (!form.challenge.trim()) newErrors.challenge = "אנא תאר את האתגר שלך";
-    return newErrors;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const errs = validate();
-    if (Object.keys(errs).length) {
-      setErrors(errs);
-      return;
-    }
-    setErrors({});
-    setStatus("loading");
-    try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.error ?? "שגיאת שרת");
-      }
-      setStatus("success");
-    } catch (err) {
-      console.error(err);
-      setStatus("idle");
-      setErrors({ challenge: err instanceof Error ? err.message : "שגיאה בשליחה, נסה שוב" });
-    }
-  };
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-    if (errors[name as keyof typeof form]) {
-      setErrors((prev) => ({ ...prev, [name]: undefined }));
-    }
-  };
 
   return (
     <section id="contact" className="py-24 lg:py-32 bg-white relative overflow-hidden">
@@ -143,8 +90,7 @@ export default function ContactForm() {
             </span>
           </h2>
           <p className="text-lg text-slate-500 max-w-xl mx-auto">
-            פגישת האפיון הראשונה היא בחינם. בוא נבין יחד איך נוכל לעזור לך לבנות את המוצר
-            שלך.
+            בוא נבין יחד איך נוכל לעזור לך לבנות את המוצר שלך.
           </p>
         </motion.div>
 
@@ -207,141 +153,41 @@ export default function ContactForm() {
             </div>
           </motion.div>
 
-          {/* Right: Form */}
+          {/* Right: Chatbot CTA */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={inView ? { opacity: 1, x: 0 } : {}}
             transition={{ delay: 0.3, duration: 0.65 }}
             className="lg:col-span-3"
           >
-            <div className="bg-white rounded-3xl border border-slate-200 shadow-xl shadow-slate-900/5 p-8">
-              {status === "success" ? (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5, ease: "easeOut" as const }}
-                  className="text-center py-12"
-                >
-                  <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-5">
-                    <CheckCircle className="w-10 h-10 text-green-500" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-slate-900 mb-2">תודה רבה!</h3>
-                  <p className="text-slate-500 max-w-sm mx-auto">
-                    קיבלנו את פנייתך. נבט יחזור אליך תוך 24 שעות לתיאום פגישת האפיון.
-                  </p>
-                  <button
-                    onClick={() => { setStatus("idle"); setForm({ name: "", company: "", phone: "", challenge: "" }); }}
-                    className="mt-6 px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl text-sm transition-colors"
-                  >
-                    שלח פנייה נוספת
-                  </button>
-                </motion.div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-5" noValidate>
-                  <div className="grid sm:grid-cols-2 gap-5">
-                    {/* Name */}
-                    <div className="space-y-1.5">
-                      <label className="block text-sm font-semibold text-slate-700 text-right">
-                        שם מלא <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        name="name"
-                        value={form.name}
-                        onChange={handleChange}
-                        placeholder="ישראל ישראלי"
-                        className={`w-full px-4 py-3 bg-slate-50 border rounded-2xl text-right text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-indigo-400 focus:ring-3 focus:ring-indigo-100 transition-all ${
-                          errors.name ? "border-red-300 bg-red-50" : "border-slate-200"
-                        }`}
-                      />
-                      {errors.name && (
-                        <p className="text-xs text-red-500 text-right">{errors.name}</p>
-                      )}
-                    </div>
+            <div className="bg-gradient-to-br from-indigo-50 via-white to-violet-50 rounded-3xl border border-indigo-100 shadow-xl shadow-indigo-900/5 p-10 flex flex-col items-center text-center gap-7 h-full justify-center min-h-[420px]">
+              {/* Icon */}
+              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-2xl shadow-indigo-500/40">
+                <MessageSquare className="w-12 h-12 text-white" />
+              </div>
 
-                    {/* Company */}
-                    <div className="space-y-1.5">
-                      <label className="block text-sm font-semibold text-slate-700 text-right">
-                        חברה / ארגון
-                      </label>
-                      <input
-                        type="text"
-                        name="company"
-                        value={form.company}
-                        onChange={handleChange}
-                        placeholder="שם החברה"
-                        className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-right text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-indigo-400 focus:ring-3 focus:ring-indigo-100 transition-all"
-                      />
-                    </div>
-                  </div>
+              {/* Text */}
+              <div>
+                <h3 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3">
+                  שוחח עם יועץ ה-AI שלנו
+                </h3>
+                <p className="text-slate-500 text-base leading-relaxed max-w-sm mx-auto">
+                  תאר את הפרויקט שלך בכמה משפטים. היועץ ינתח את הצרכים ויעביר לנבט סיכום מוכן — ללא צורך בהשארת פרטים.
+                </p>
+              </div>
 
-                  {/* Phone */}
-                  <div className="space-y-1.5">
-                    <label className="block text-sm font-semibold text-slate-700 text-right">
-                      טלפון <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={form.phone}
-                      onChange={handleChange}
-                      placeholder="050-000-0000"
-                      dir="ltr"
-                      className={`w-full px-4 py-3 bg-slate-50 border rounded-2xl text-right text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-indigo-400 focus:ring-3 focus:ring-indigo-100 transition-all ${
-                        errors.phone ? "border-red-300 bg-red-50" : "border-slate-200"
-                      }`}
-                    />
-                    {errors.phone && (
-                      <p className="text-xs text-red-500 text-right">{errors.phone}</p>
-                    )}
-                  </div>
+              {/* CTA Button */}
+              <motion.button
+                onClick={openChatbot}
+                className="inline-flex items-center gap-2.5 px-8 py-4 bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold rounded-full shadow-xl shadow-indigo-500/35 hover:shadow-indigo-500/55 transition-all duration-200 text-base"
+                whileHover={{ scale: 1.04, y: -2 }}
+                whileTap={{ scale: 0.97 }}
+              >
+                פתח את הצ׳אטבוט
+                <ArrowLeft className="w-5 h-5" />
+              </motion.button>
 
-                  {/* Challenge */}
-                  <div className="space-y-1.5">
-                    <label className="block text-sm font-semibold text-slate-700 text-right">
-                      ספר לנו על האתגר ההנדסי שלך <span className="text-red-500">*</span>
-                    </label>
-                    <textarea
-                      name="challenge"
-                      value={form.challenge}
-                      onChange={handleChange}
-                      rows={5}
-                      placeholder="תאר את הפרויקט, האתגרים העיקריים, לוחות הזמנים ומה אתה מחפש בשותף הנדסי..."
-                      className={`w-full px-4 py-3 bg-slate-50 border rounded-2xl text-right text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:border-indigo-400 focus:ring-3 focus:ring-indigo-100 transition-all resize-none leading-relaxed ${
-                        errors.challenge ? "border-red-300 bg-red-50" : "border-slate-200"
-                      }`}
-                    />
-                    {errors.challenge && (
-                      <p className="text-xs text-red-500 text-right">{errors.challenge}</p>
-                    )}
-                  </div>
-
-                  {/* Submit */}
-                  <motion.button
-                    type="submit"
-                    disabled={status === "loading"}
-                    className="w-full flex items-center justify-center gap-2.5 py-4 bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold rounded-2xl shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 disabled:opacity-70 disabled:cursor-not-allowed transition-all text-sm"
-                    whileHover={{ scale: status === "idle" ? 1.02 : 1, y: status === "idle" ? -1 : 0 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    {status === "loading" ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        שולח...
-                      </>
-                    ) : (
-                      <>
-                        שלח פנייה
-                        <Send className="w-4 h-4" />
-                      </>
-                    )}
-                  </motion.button>
-
-                  <p className="text-center text-xs text-slate-400">
-                    פגישת האפיון הראשונה ללא עלות · פרטיך מאובטחים ולא יועברו לצד ג&apos;
-                  </p>
-                </form>
-              )}
+              <p className="text-xs text-slate-400">תגובה מיידית · ללא צורך בהרשמה</p>
             </div>
           </motion.div>
         </div>
