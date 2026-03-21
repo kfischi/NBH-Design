@@ -1,0 +1,44 @@
+# ── Netlify Configuration ────────────────────────────────────────────
+[build]
+  command   = "npm run build"
+  publish   = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# ── Next.js plugin (required for SSR/API routes) ─────────────────────
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# ── Redirect rules ────────────────────────────────────────────────────
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200
+
+# ── Security headers ─────────────────────────────────────────────────
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options          = "DENY"
+    X-Content-Type-Options   = "nosniff"
+    Referrer-Policy          = "strict-origin-when-cross-origin"
+    Permissions-Policy       = "camera=(), microphone=(), geolocation=()"
+    Content-Security-Policy  = """
+      default-src 'self';
+      script-src  'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com;
+      style-src   'self' 'unsafe-inline' https://fonts.googleapis.com;
+      font-src    'self' https://fonts.gstatic.com;
+      img-src     'self' data: https://res.cloudinary.com;
+      connect-src 'self' https://*.netlify.com;
+    """
+
+# ── Branch deploy settings ────────────────────────────────────────────
+[context.production]
+  command = "npm run build"
+
+[context.staging]
+  command = "npm run build"
+
+[context.deploy-preview]
+  command = "npm run build"
