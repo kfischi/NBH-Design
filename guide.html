@@ -459,24 +459,53 @@ const slides = [
         icon: '👑',
         title: 'שבת חתן בסטנדרט שלא הכרת',
         body: 'כל המשפחה מרוכזת, כולם מרוצים, ואת... נהנית. לא מתרוצצת. כי כל הפרטים כבר סוכמו לפני שהגעת.',
-        chips: ['חדרי יוקרה', 'קייטרינג VIP', 'צ\'ק ליסט מלא']
+        chips: ['חדרי יוקרה', 'קייטרינג VIP', "צ'ק ליסט מלא"]
     },
     {
         num: '05',
-        icon: '✨',
-        title: 'מה בדיוק יש במדריך?',
-        body: 'רשימת לוקיישנים סודית לפי אזורים ► צ\'ק ליסט שבת חתן מלא ► שאלות שחייבים לשאול ► טיפים שרק מבפנים.',
-        chips: ['מיידי ל-WhatsApp', 'גישה לצמיתות']
+        icon: '⚡',
+        title: 'מוקשים בחוזה: איפה הכסף בורח?',
+        body: 'שתי שאלות שרוב האנשים שוכחים לשאול – ושולמות ביוקר.',
+        isList: true,
+        items: [
+            { icon: '⚡', title: 'חשמל גלובלי', body: 'בלי "לפי מונה"! שבת של 25 שעות עם מזגנים היא בור תקציבי. סגרו מחיר הכל-כלול מראש.' },
+            { icon: '🧹', title: 'מי מנקה?', body: 'הגדירו בחוזה מי מנקה רצפה ושירותים בשבת. אל תניחו שהמקום עושה זאת כברירת מחדל.' }
+        ]
     },
     {
         num: '06',
+        icon: '🕐',
+        title: 'חוק ה-14:00',
+        body: 'בשבתות חורף קצרות, הגעה מאוחרת היא האויב של השמחה. כל דקה שמאחרים = דקה פחות של שקט. הכלל הזה אחד הדברים שמבדילים בין שבת חתן כאוטית לכזו שמרגישה כמו חופשה.',
+        chips: ['כנסו לחדרים עד 14:00', 'אל תפשרו על זה']
+    },
+    {
+        num: '07',
+        icon: '🛍️',
+        title: 'הפרטים הקטנים שסוגרים אירוע',
+        body: 'שני דברים שנשכחים תמיד – ועולים ביוקר ברגע האמת.',
+        isList: true,
+        items: [
+            { icon: '🛍️', title: 'שקיות ניילון', body: 'לאריזת שאריות ופינוי מהיר. וודאו שיש במקום מראש, לא תרצו לרוץ לסופר בשבת.' },
+            { icon: '🎲', title: 'משחקים וחיבורים', body: 'פינת משחקי קופסה בלובי וטריוויה משפחתית סביב השולחן – יוצרים רגעים שלא נשכחים.' }
+        ]
+    },
+    {
+        num: '08',
         icon: '🤍',
         title: 'ערדית בראון – האישה מאחורי הקסם',
         body: 'אחרי אלפי אירועים ולוקיישנים שנבדקו, ערדית בנתה מדריך שהיה רוצה שיהיה לה כשהתחילה. עכשיו הוא שלך.',
         chips: ['סיפור אמיתי', 'תוצאות אמיתיות']
     },
     {
-        num: '07',
+        num: '09',
+        icon: '✨',
+        title: 'המדריך נתן כלים. אני אתן לך שקט.',
+        body: '"בואי נהפוך את השבת שלך לסיפור הצלחה בסטנדרט מולטי בראון."',
+        isCTA: true
+    },
+    {
+        num: '10',
         icon: '🎁',
         title: 'ההצעה שלא תחזור',
         body: 'מארז הלוקיישנים המלא – הגישה המיידית שלך לכל הידע.',
@@ -522,6 +551,39 @@ function buildSlides(){
                 <button class="cta-btn" onclick="window.location.href='https://www.multibrawn.co.il/pay'">
                     אני רוצה את המדריך עכשיו! ←
                 </button>
+            `;
+        } else if(s.isCTA){
+            div.innerHTML = `
+                <div class="slide-num">${s.num}</div>
+                <div class="slide-icon" style="font-size:44px">${s.icon}</div>
+                <div class="slide-title">${s.title}</div>
+                <p class="slide-body" style="font-style:italic;margin-bottom:28px">${s.body}</p>
+                <div style="display:flex;flex-direction:column;gap:14px;margin-top:8px">
+                    <div style="padding:18px 20px;border:2px solid var(--pink);border-radius:18px;background:rgba(233,30,99,.08);cursor:pointer" onclick="nextStep()">
+                        <div style="font-weight:700;font-size:1.05rem;color:var(--pink-l)">🏡 בנק הלוקיישנים הסודי</div>
+                    </div>
+                    <div style="padding:18px 20px;border:1.5px solid rgba(255,255,255,.12);border-radius:18px;background:rgba(255,255,255,.04);cursor:pointer" onclick="nextStep()">
+                        <div style="font-weight:700;font-size:1.05rem;color:rgba(255,255,255,.75)">📋 בדיקת חוזה VIP</div>
+                    </div>
+                </div>
+                <button class="cta-btn" style="margin-top:20px" onclick="nextStep()">
+                    בואי נתחיל לעבוד ←
+                </button>
+            `;
+        } else if(s.isList){
+            div.innerHTML = `
+                <div class="slide-num">${s.num}</div>
+                <div class="slide-icon">${s.icon}</div>
+                <div class="slide-title">${s.title}</div>
+                <p class="slide-body" style="margin-bottom:20px">${s.body}</p>
+                <div style="display:flex;flex-direction:column;gap:12px">
+                    ${s.items.map(item => `
+                        <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:16px 18px">
+                            <div style="font-weight:700;font-size:1rem;color:var(--pink-l);margin-bottom:5px">${item.icon} ${item.title}</div>
+                            <div style="font-size:.88rem;color:rgba(255,255,255,.6);line-height:1.65">${item.body}</div>
+                        </div>
+                    `).join('')}
+                </div>
             `;
         } else {
             div.innerHTML = `
