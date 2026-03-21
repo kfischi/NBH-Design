@@ -126,6 +126,13 @@ export default function ProjectChatbot() {
     }
   }, [open]);
 
+  /* Listen for the global open event dispatched by Hero / Header */
+  useEffect(() => {
+    const handler = () => setOpen(true);
+    window.addEventListener("nbh:open-chatbot", handler);
+    return () => window.removeEventListener("nbh:open-chatbot", handler);
+  }, []);
+
   /* ── Send ──────────────────────────────────────────────────────── */
 
   const send = useCallback(async () => {
@@ -207,30 +214,45 @@ export default function ProjectChatbot() {
       <div className="fixed bottom-6 left-6 z-50">
         <AnimatePresence>
           {!open && (
-            <motion.button
+            <motion.div
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 420, damping: 26 }}
-              whileHover={{ scale: 1.04, y: -2 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={() => setOpen(true)}
-              className="relative flex items-center gap-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white pl-5 pr-4 py-3 rounded-full shadow-xl shadow-indigo-500/35 transition-all duration-200"
-              aria-label="פתח יועץ פרויקטים"
+              transition={{ type: "spring", stiffness: 380, damping: 24 }}
+              className="flex flex-col items-start gap-2"
             >
-              <Sparkles className="w-4 h-4 text-indigo-200" />
-              <span className="text-sm font-semibold tracking-tight">
-                התחל פרויקט
-              </span>
+              {/* Tooltip bubble */}
+              <motion.div
+                initial={{ opacity: 0, x: -8 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 1.8, duration: 0.4 }}
+                className="mr-1 bg-white text-slate-800 text-xs font-semibold px-3 py-2 rounded-2xl rounded-bl-sm shadow-lg border border-slate-100 max-w-[180px] leading-snug"
+                dir="rtl"
+              >
+                💬 רוצה לדון בפרויקט? אני כאן
+              </motion.div>
 
-              {/* Unread dot */}
-              {unread && (
-                <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white" />
-              )}
+              {/* Main button */}
+              <motion.button
+                whileHover={{ scale: 1.06, y: -3 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setOpen(true)}
+                className="relative flex items-center gap-3 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white pl-6 pr-5 py-3.5 rounded-full shadow-2xl shadow-indigo-500/45 transition-all duration-200"
+                aria-label="פתח יועץ פרויקטים"
+              >
+                <Sparkles className="w-5 h-5 text-indigo-200 flex-shrink-0" />
+                <span className="text-sm font-bold tracking-tight">יועץ AI</span>
 
-              {/* Pulse ring */}
-              <span className="absolute inset-0 rounded-full ring-2 ring-indigo-400/60 animate-ping pointer-events-none" />
-            </motion.button>
+                {/* Unread dot */}
+                {unread && (
+                  <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 rounded-full border-2 border-white shadow-sm" />
+                )}
+
+                {/* Dual pulse rings */}
+                <span className="absolute inset-0 rounded-full ring-2 ring-indigo-500/50 animate-ping pointer-events-none" />
+                <span className="absolute inset-0 rounded-full ring-4 ring-violet-400/25 animate-ping pointer-events-none" style={{ animationDelay: "0.3s" }} />
+              </motion.button>
+            </motion.div>
           )}
         </AnimatePresence>
       </div>
