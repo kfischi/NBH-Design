@@ -6,6 +6,7 @@ import Testimonials from "@/components/Testimonials";
 import About from "@/components/About";
 import ContactForm from "@/components/ContactForm";
 import Footer from "@/components/Footer";
+import ProjectChatbot from "@/components/ProjectChatbot";
 
 export default function Home() {
   return (
@@ -18,6 +19,7 @@ export default function Home() {
       <About />
       <ContactForm />
       <Footer />
+      <ProjectChatbot />
     </main>
   );
 }
