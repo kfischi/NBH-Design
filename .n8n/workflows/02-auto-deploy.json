@@ -1,0 +1,231 @@
+{
+  "name": "NBH — Auto Deploy",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "nbh-deploy-production",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "webhook-deploy",
+      "name": "Webhook — Deploy Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "nbh-deploy-production"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "hours", "hoursInterval": 24 }]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Schedule — Daily Deploy (optional)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 500]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            { "id": "environment", "name": "environment", "value": "=={{ $json.body?.environment ?? 'production' }}", "type": "string" },
+            { "id": "reason",      "name": "reason",      "value": "=={{ $json.body?.reason ?? 'scheduled deploy' }}", "type": "string" },
+            { "id": "triggeredAt", "name": "triggeredAt", "value": "={{ $now.toISO() }}", "type": "string" }
+          ]
+        }
+      },
+      "id": "set-deploy-params",
+      "name": "Set Deploy Params",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "url": "=https://api.netlify.com/build_hooks/{{ $env.NETLIFY_BUILD_HOOK_ID }}",
+        "sendHeaders": false,
+        "options": { "timeout": 15000 }
+      },
+      "id": "netlify-hook",
+      "name": "Netlify — Build Hook",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [720, 200],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "url": "https://api.github.com/repos/{{ $env.GITHUB_REPO_OWNER }}/{{ $env.GITHUB_REPO_NAME }}/dispatches",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization",  "value": "=Bearer {{ $env.GITHUB_PAT }}" },
+            { "name": "Accept",         "value": "application/vnd.github.v3+json" },
+            { "name": "Content-Type",   "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "event_type",     "value": "=deploy-{{ $('Set Deploy Params').first().json.environment }}" },
+            {
+              "name": "client_payload",
+              "value": "={\"reason\":\"{{ $('Set Deploy Params').first().json.reason }}\",\"triggeredAt\":\"{{ $('Set Deploy Params').first().json.triggeredAt }}\",\"triggeredBy\":\"n8n-auto-deploy\"}"
+            }
+          ]
+        },
+        "options": { "timeout": 15000 }
+      },
+      "id": "github-dispatch",
+      "name": "GitHub — Repository Dispatch",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [720, 380],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "amount": 90,
+        "unit": "seconds"
+      },
+      "id": "wait-for-build",
+      "name": "Wait 90s for Build",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [940, 300],
+      "webhookId": "wait-deploy"
+    },
+    {
+      "parameters": {
+        "url": "https://api.netlify.com/api/v1/sites/{{ $env.NETLIFY_SITE_ID }}/deploys?per_page=1",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "=Bearer {{ $env.NETLIFY_AUTH_TOKEN }}" }
+          ]
+        },
+        "options": { "timeout": 15000 }
+      },
+      "id": "check-deploy-status",
+      "name": "Check Deploy Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1160, 300],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const deploys = $input.first().json;\nconst latest = Array.isArray(deploys) ? deploys[0] : {};\nconst status = latest.state ?? 'unknown';\nconst url    = latest.ssl_url ?? latest.deploy_ssl_url ?? '';\nreturn [{ json: { deployState: status, deployUrl: url, deployId: latest.id ?? '' } }];"
+      },
+      "id": "parse-deploy-status",
+      "name": "Parse Deploy Status",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1380, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.WAHA_BASE_URL }}/api/sendText",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type", "value": "application/json" },
+            { "name": "X-Api-Key",    "value": "={{ $env.WAHA_API_KEY }}" }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "session", "value": "default" },
+            { "name": "chatId",  "value": "={{ $env.WAHA_TO_NUMBER }}@c.us" },
+            {
+              "name": "text",
+              "value": "={{ $json.deployState === 'ready' ? '✅' : '⚠️' }} *NBH Engineering — Deploy {{ $json.deployState === 'ready' ? 'הצליח' : 'סטטוס: ' + $json.deployState }}*\n\n🌐 {{ $json.deployUrl }}\n🕐 {{ $now.toFormat('HH:mm') }}\n📋 ID: {{ $json.deployId }}"
+            }
+          ]
+        },
+        "options": { "timeout": 10000 }
+      },
+      "id": "whatsapp-result",
+      "name": "WhatsApp — Deploy Result",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1600, 300],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.NEXT_PUBLIC_SITE_URL }}/api/n8n/webhook",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type",     "value": "application/json" },
+            { "name": "x-webhook-secret", "value": "={{ $env.N8N_WEBHOOK_SECRET }}" }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "type",       "value": "deploy_completed" },
+            { "name": "branch",     "value": "=={{ $('Set Deploy Params').first().json.environment }}" },
+            { "name": "deployUrl",  "value": "=={{ $('Parse Deploy Status').first().json.deployUrl }}" },
+            { "name": "buildTime",  "value": "90" },
+            { "name": "timestamp",  "value": "=={{ $now.toISO() }}" }
+          ]
+        },
+        "options": { "timeout": 10000 }
+      },
+      "id": "callback-app",
+      "name": "Callback — Notify App",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1600, 460],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\"ok\":true,\"triggered\":true,\"environment\":\"{{ $('Set Deploy Params').first().json.environment }}\"}"
+      },
+      "id": "respond-deploy",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [960, 160]
+    }
+  ],
+  "connections": {
+    "Webhook — Deploy Trigger":   { "main": [[{ "node": "Set Deploy Params",  "type": "main", "index": 0 }]] },
+    "Schedule — Daily Deploy (optional)": { "main": [[{ "node": "Set Deploy Params", "type": "main", "index": 0 }]] },
+    "Set Deploy Params": {
+      "main": [[
+        { "node": "Netlify — Build Hook",         "type": "main", "index": 0 },
+        { "node": "GitHub — Repository Dispatch", "type": "main", "index": 0 },
+        { "node": "Respond to Webhook",           "type": "main", "index": 0 }
+      ]]
+    },
+    "Netlify — Build Hook":          { "main": [[{ "node": "Wait 90s for Build",    "type": "main", "index": 0 }]] },
+    "GitHub — Repository Dispatch":  { "main": [[{ "node": "Wait 90s for Build",    "type": "main", "index": 0 }]] },
+    "Wait 90s for Build":            { "main": [[{ "node": "Check Deploy Status",   "type": "main", "index": 0 }]] },
+    "Check Deploy Status":           { "main": [[{ "node": "Parse Deploy Status",   "type": "main", "index": 0 }]] },
+    "Parse Deploy Status": {
+      "main": [[
+        { "node": "WhatsApp — Deploy Result", "type": "main", "index": 0 },
+        { "node": "Callback — Notify App",    "type": "main", "index": 0 }
+      ]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true
+  },
+  "tags": ["nbh", "deploy", "automation"],
+  "meta": {
+    "instanceId": "nbh-engineering"
+  }
+}

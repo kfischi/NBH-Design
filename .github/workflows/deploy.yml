@@ -8,6 +8,10 @@ on:
   pull_request:
     branches:
       - main          # PR checks before merge
+  repository_dispatch:
+    types:
+      - deploy-production   # Triggered by N8N or /api/deploy/trigger
+      - deploy-staging
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -61,8 +65,8 @@ jobs:
     name: Deploy → Netlify
     needs: build
     runs-on: ubuntu-latest
-    # Only deploy on push (not on PRs — PRs just run the build check)
-    if: github.event_name == 'push'
+    # Deploy on push or repository_dispatch (N8N / API trigger) — not on PRs
+    if: github.event_name == 'push' || github.event_name == 'repository_dispatch'
 
     steps:
       - uses: actions/checkout@v4
@@ -84,9 +88,9 @@ jobs:
       - name: Install Netlify CLI
         run: npm install -g netlify-cli@latest
 
-      # Production deploy (main branch only)
+      # Production deploy (main branch OR N8N dispatch)
       - name: Deploy to Production
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' || github.event.action == 'deploy-production'
         run: |
           netlify deploy \
             --dir=.next \
@@ -98,9 +102,9 @@ jobs:
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
 
-      # Preview deploy (staging branch)
+      # Preview deploy (staging branch OR N8N dispatch)
       - name: Deploy Preview (staging)
-        if: github.ref == 'refs/heads/staging'
+        if: github.ref == 'refs/heads/staging' || github.event.action == 'deploy-staging'
         id: preview
         run: |
           OUTPUT=$(netlify deploy \
