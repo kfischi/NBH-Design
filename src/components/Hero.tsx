@@ -91,11 +91,11 @@ export default function Hero() {
                   <span
                     style={{
                       background:
-                        "linear-gradient(135deg,#67e8f9 0%,#38bdf8 35%,#06b6d4 65%,#a5f3fc 100%)",
+                        "linear-gradient(135deg,#bae6fd 0%,#60a5fa 35%,#2563eb 65%,#93c5fd 100%)",
                       WebkitBackgroundClip: "text",
                       WebkitTextFillColor: "transparent",
                       backgroundClip: "text",
-                      filter: "drop-shadow(0 0 22px rgba(6,182,212,0.75))",
+                      filter: "drop-shadow(0 0 24px rgba(37,99,235,0.8))",
                     }}
                   >
                     רב-תחומית
