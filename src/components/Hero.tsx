@@ -37,7 +37,7 @@ export default function Hero() {
       />
 
       {/* ── Mobile overlay: uniform dark ── */}
-      <div className="absolute inset-0 z-10 bg-black/60 lg:bg-transparent" />
+      <div className="absolute inset-0 z-10 bg-black/25 lg:bg-transparent" />
 
       {/* ── Desktop overlay: directional — very dark right, transparent left ── */}
       <div className="absolute inset-0 z-10 hidden lg:block bg-gradient-to-l from-black/90 via-black/60 to-black/15" />
@@ -88,16 +88,7 @@ export default function Hero() {
                   style={{ textShadow: "0 2px 24px rgba(0,0,0,0.9), 0 1px 6px rgba(0,0,0,0.8)" }}
                 >
                   הנדסה{" "}
-                  <span
-                    style={{
-                      background:
-                        "linear-gradient(135deg,#bae6fd 0%,#60a5fa 35%,#2563eb 65%,#93c5fd 100%)",
-                      WebkitBackgroundClip: "text",
-                      WebkitTextFillColor: "transparent",
-                      backgroundClip: "text",
-                      filter: "drop-shadow(0 0 24px rgba(37,99,235,0.8))",
-                    }}
-                  >
+                  <span className="text-white">
                     רב-תחומית
                   </span>
                   <br />
