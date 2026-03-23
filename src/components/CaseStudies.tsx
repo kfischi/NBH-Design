@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
 import { useRef } from "react";
+import Link from "next/link";
 import {
   ShoppingCart,
   Crosshair,
@@ -74,10 +75,13 @@ const cases = [
     size: "medium",
     gradient: "from-emerald-50 to-teal-50",
     accentColor: "emerald",
+    slug: "greenhouse-iot",
   },
 ];
 
-function CaseCard({ project, index }: { project: typeof cases[0]; index: number }) {
+type Case = typeof cases[0] & { slug?: string };
+
+function CaseCard({ project, index }: { project: Case; index: number }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
   const Icon = project.icon;
@@ -124,10 +128,20 @@ function CaseCard({ project, index }: { project: typeof cases[0]; index: number 
             ))}
           </div>
 
-          <button className="flex items-center gap-1.5 text-sm font-semibold text-slate-700 hover:text-indigo-600 mt-auto transition-colors group-hover:gap-2.5">
-            קרא מקרה בוחן מלא
-            <ArrowUpRight className="w-4 h-4" />
-          </button>
+          {project.slug ? (
+            <Link
+              href={`/projects/${project.slug}`}
+              className="flex items-center gap-1.5 text-sm font-semibold text-slate-700 hover:text-indigo-600 mt-auto transition-colors group-hover:gap-2.5"
+            >
+              קרא מקרה בוחן מלא
+              <ArrowUpRight className="w-4 h-4" />
+            </Link>
+          ) : (
+            <button className="flex items-center gap-1.5 text-sm font-semibold text-slate-700 hover:text-indigo-600 mt-auto transition-colors group-hover:gap-2.5">
+              קרא מקרה בוחן מלא
+              <ArrowUpRight className="w-4 h-4" />
+            </button>
+          )}
         </div>
 
         {/* Stats panel */}
