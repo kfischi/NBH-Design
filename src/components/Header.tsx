@@ -3,9 +3,10 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Zap } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
-/* ── WhatsApp number — update when Nevet's number is ready ── */
-const WHATSAPP_NUMBER = "972500000000"; // TODO: replace with Nevet's number
+const WHATSAPP_NUMBER = "972500000000";
 
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
@@ -16,16 +17,17 @@ function WhatsAppIcon({ className }: { className?: string }) {
 }
 
 const navLinks = [
-  { label: "שירותים",    href: "#services"     },
-  { label: "תהליך",      href: "#process"      },
-  { label: "מקרי בוחן",  href: "#case-studies"  },
-  { label: "אודות",      href: "#about"         },
-  { label: "צור קשר",   href: "#contact"       },
+  { label: "שירותים",   href: "/services"     },
+  { label: "תהליך",     href: "/process"      },
+  { label: "מקרי בוחן", href: "/case-studies"  },
+  { label: "אודות",     href: "/about"         },
+  { label: "צור קשר",  href: "/contact"       },
 ];
 
 export default function Header() {
   const [scrolled, setScrolled]     = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
@@ -34,19 +36,17 @@ export default function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const scrollTo = (href: string) => {
-    setMobileOpen(false);
-    document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
-  };
+  const isHome = pathname === "/";
+  const solid = scrolled || !isHome;
 
   return (
     <>
       <motion.header
         initial={{ y: -80, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, ease: "easeOut" as const }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
         className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
-          scrolled
+          solid
             ? "bg-white/85 backdrop-blur-xl border-b border-slate-200/60 shadow-sm shadow-slate-900/5"
             : "bg-black/25 backdrop-blur-md border-b border-white/8"
         }`}
@@ -54,46 +54,47 @@ export default function Header() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
 
-            {/* Logo */}
-            <motion.a
-              href="#"
-              onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-              className="flex items-center gap-2.5 group"
-              whileHover={{ scale: 1.02 }}
-            >
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                <Zap className="w-4 h-4 text-white" strokeWidth={2.5} />
-              </div>
-              <div className="flex flex-col leading-none">
-                <span className={`font-bold text-base tracking-tight transition-colors duration-300 ${scrolled ? "text-slate-900" : "text-white"}`}>
-                  NBH
-                </span>
-                <span className={`text-[10px] font-medium tracking-wider uppercase transition-colors duration-300 ${scrolled ? "text-slate-500" : "text-white/60"}`}>
-                  Engineering
-                </span>
-              </div>
-            </motion.a>
+            <Link href="/" className="flex items-center gap-2.5 group">
+              <motion.div whileHover={{ scale: 1.02 }} className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                  <Zap className="w-4 h-4 text-white" strokeWidth={2.5} />
+                </div>
+                <div className="flex flex-col leading-none">
+                  <span className={`font-bold text-base tracking-tight transition-colors duration-300 ${solid ? "text-slate-900" : "text-white"}`}>
+                    NBH
+                  </span>
+                  <span className={`text-[10px] font-medium tracking-wider uppercase transition-colors duration-300 ${solid ? "text-slate-500" : "text-white/60"}`}>
+                    Engineering
+                  </span>
+                </div>
+              </motion.div>
+            </Link>
 
-            {/* Desktop Nav */}
             <nav className="hidden md:flex items-center gap-0.5">
-              {navLinks.map((link) => (
-                <motion.button
-                  key={link.href}
-                  onClick={() => scrollTo(link.href)}
-                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-150 ${
-                    scrolled
-                      ? "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-                      : "text-white/80 hover:text-white hover:bg-white/12"
-                  }`}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  {link.label}
-                </motion.button>
-              ))}
+              {navLinks.map((link) => {
+                const active = pathname === link.href;
+                return (
+                  <Link key={link.href} href={link.href}>
+                    <motion.span
+                      className={`block px-4 py-2 text-sm font-medium rounded-lg transition-all duration-150 cursor-pointer ${
+                        solid
+                          ? active
+                            ? "text-indigo-600 bg-indigo-50"
+                            : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                          : active
+                            ? "text-white bg-white/20"
+                            : "text-white/80 hover:text-white hover:bg-white/12"
+                      }`}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      {link.label}
+                    </motion.span>
+                  </Link>
+                );
+              })}
             </nav>
 
-            {/* CTA */}
             <div className="flex items-center gap-3">
               <motion.a
                 href={`https://wa.me/${WHATSAPP_NUMBER}`}
@@ -107,10 +108,9 @@ export default function Header() {
                 וואטסאפ
               </motion.a>
 
-              {/* Mobile menu */}
               <button
                 className={`md:hidden p-2 rounded-lg transition-colors ${
-                  scrolled ? "text-slate-600 hover:bg-slate-100" : "text-white hover:bg-white/15"
+                  solid ? "text-slate-600 hover:bg-slate-100" : "text-white hover:bg-white/15"
                 }`}
                 onClick={() => setMobileOpen(!mobileOpen)}
               >
@@ -121,7 +121,6 @@ export default function Header() {
         </div>
       </motion.header>
 
-      {/* Mobile menu */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
@@ -133,13 +132,18 @@ export default function Header() {
           >
             <nav className="flex flex-col p-4 gap-1">
               {navLinks.map((link) => (
-                <button
+                <Link
                   key={link.href}
-                  onClick={() => scrollTo(link.href)}
-                  className="text-right px-4 py-3 text-base font-medium text-slate-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-colors"
+                  href={link.href}
+                  onClick={() => setMobileOpen(false)}
+                  className={`text-right px-4 py-3 text-base font-medium rounded-xl transition-colors ${
+                    pathname === link.href
+                      ? "text-indigo-600 bg-indigo-50"
+                      : "text-slate-700 hover:text-indigo-600 hover:bg-indigo-50"
+                  }`}
                 >
                   {link.label}
-                </button>
+                </Link>
               ))}
               <a
                 href={`https://wa.me/${WHATSAPP_NUMBER}`}
