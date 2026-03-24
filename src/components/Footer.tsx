@@ -151,7 +151,7 @@ export default function Footer() {
 
       {/* Bottom bar */}
       <div className="border-t border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-wrap items-center justify-between gap-3">
           <button
             onClick={scrollToTop}
             className="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 flex items-center justify-center transition-colors"
@@ -159,8 +159,18 @@ export default function Footer() {
           >
             <ArrowUp className="w-4 h-4 text-slate-400" />
           </button>
+
+          {/* Legal links */}
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500">
+            <Link href="/privacy"       className="hover:text-slate-300 transition-colors">מדיניות פרטיות</Link>
+            <span className="text-slate-700">·</span>
+            <Link href="/cookies"       className="hover:text-slate-300 transition-colors">מדיניות עוגיות</Link>
+            <span className="text-slate-700">·</span>
+            <Link href="/accessibility" className="hover:text-slate-300 transition-colors">הצהרת נגישות</Link>
+          </div>
+
           <p className="text-slate-500 text-xs">
-            © {new Date().getFullYear()} NBH Engineering Solutions · כל הזכויות שמורות
+            © {new Date().getFullYear()} NBH Engineering Solutions
           </p>
         </div>
       </div>
