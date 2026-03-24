@@ -1,17 +1,56 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import AccessibilityWidget from "@/components/AccessibilityWidget";
+import { GoogleAnalytics, GoogleTagManager } from "@/components/Analytics";
+import { JsonLd } from "@/components/JsonLd";
+import { organizationSchema, websiteSchema, SITE_URL } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "NBH Engineering Solutions | הנדסה רב-תחומית",
+  title: {
+    default: "NBH Engineering Solutions | הנדסה רב-תחומית",
+    template: "%s | NBH Engineering Solutions",
+  },
   description:
-    "פתרונות הנדסיים קצה לקצה - מכניקה, אלקטרוניקה ומערכת. NBH Engineering Solutions בהובלת נבט בן חיים.",
-  keywords: "הנדסה, מכניקה, אלקטרוניקה, IoT, RFID, אוטומציה, PLC, CAD",
+    "פתרונות הנדסיים קצה לקצה — מכניקה, אלקטרוניקה ומיכון. 12+ שנות ניסיון, 50+ פרויקטים, 3 פטנטים. פנה לנבט בן חיים.",
+  metadataBase: new URL(SITE_URL),
+  keywords: [
+    "הנדסה רב-תחומית",
+    "תכנון PCB",
+    "IoT",
+    "אוטומציה תעשייתית",
+    "PLC",
+    "הדפסת תלת מימד",
+    "פיתוח מוצר",
+    "אב טיפוס",
+    "מהנדס עצמאי ישראל",
+    "NBH Engineering",
+  ].join(", "),
+  authors: [{ name: "נבט בן חיים", url: `${SITE_URL}/about` }],
+  creator: "נבט בן חיים",
+  publisher: "NBH Engineering Solutions",
+  alternates: { canonical: SITE_URL },
   openGraph: {
-    title: "NBH Engineering Solutions",
-    description: "הנדסה רב-תחומית לפתרונות מורכבים",
+    title: "NBH Engineering Solutions | הנדסה רב-תחומית",
+    description: "פתרונות הנדסיים מכניקה, אלקטרוניקה ומיכון — תחת קורת גג אחת.",
     type: "website",
     locale: "he_IL",
+    url: SITE_URL,
+    siteName: "NBH Engineering Solutions",
+    images: [{ url: `${SITE_URL}/og-image.jpg`, width: 1200, height: 630, alt: "NBH Engineering Solutions" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "NBH Engineering Solutions",
+    description: "הנדסה רב-תחומית לפתרונות מורכבים — מכניקה, PCB, IoT, אוטומציה.",
+    images: [`${SITE_URL}/og-image.jpg`],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large" },
+  },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
   },
 };
 
@@ -30,11 +69,17 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap"
           rel="stylesheet"
         />
+        {/* Global JSON-LD: Organization + WebSite */}
+        <JsonLd data={[organizationSchema, websiteSchema]} />
       </head>
       <body className="min-h-full flex flex-col bg-slate-50 text-slate-900">
+        {/* GTM noscript must be first in body */}
+        <GoogleTagManager />
         {children}
         {/* Accessibility widget — מופיע בכל דף */}
         <AccessibilityWidget />
+        {/* GA4 — loaded after interactive */}
+        <GoogleAnalytics />
       </body>
     </html>
   );
