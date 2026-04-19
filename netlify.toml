@@ -20,11 +20,13 @@
     Permissions-Policy       = "camera=(), microphone=(), geolocation=()"
     Content-Security-Policy  = """
       default-src 'self';
-      script-src  'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com;
+      script-src  'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com;
       style-src   'self' 'unsafe-inline' https://fonts.googleapis.com;
       font-src    'self' https://fonts.gstatic.com;
-      img-src     'self' data: https://res.cloudinary.com;
-      connect-src 'self' https://*.netlify.com;
+      img-src     'self' data: https://res.cloudinary.com https://www.googletagmanager.com;
+      media-src   'self' https://res.cloudinary.com;
+      frame-src   https://www.googletagmanager.com;
+      connect-src 'self' https://*.netlify.com https://www.google-analytics.com https://analytics.google.com https://www.googletagmanager.com https://res.cloudinary.com;
     """
 
 # ── Branch deploy settings ────────────────────────────────────────────
