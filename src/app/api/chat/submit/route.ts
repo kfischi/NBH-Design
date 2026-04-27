@@ -1,26 +1,34 @@
 /**
  * POST /api/chat/submit
  *
- * Called when the intake conversation is complete.
- * Steps:
- *  1. Uses Claude to generate a structured Hebrew summary from the conversation
- *  2. Sends summary to Nevet via WhatsApp (WAHA)
- *  3. Creates a Notion entry (if configured)
- *  4. Triggers N8N lead-agent webhook (if configured)
+ * Called when the AI intake conversation finishes. Steps:
+ *   1. Claude generates a structured Hebrew summary of the conversation.
+ *   2. Notion (canonical) — create a lead row with the summary attached.
+ *   3. Resend — notification email to Nevet, with link to the Notion page.
+ *   4. Resend — confirmation email to the lead (only if email was extracted).
+ *   5. n8n + WAHA — fire if env is set, otherwise skip (Phase 2).
  *
  * Body: { messages: { role: "user"|"assistant"; content: string }[] }
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
+import { createLead, type NotionLead } from "@/lib/notion-client";
+import {
+  sendLeadConfirmation,
+  sendLeadNotification,
+} from "@/lib/email-client";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-/* ── Summary generator ──────────────────────────────────────────── */
+interface ChatMessage {
+  role: string;
+  content: string;
+}
 
-async function generateSummary(
-  messages: { role: string; content: string }[]
-): Promise<string> {
+/* ── Summary generator ──────────────────────────────────────────────── */
+
+async function generateSummary(messages: ChatMessage[]): Promise<string> {
   const msg = await client.messages.create({
     model: "claude-sonnet-4-6",
     max_tokens: 800,
@@ -43,58 +51,63 @@ async function generateSummary(
   return block.type === "text" ? block.text : "";
 }
 
-/* ── WhatsApp via WAHA ──────────────────────────────────────────── */
+/* ── Heuristic extraction from the user-side of the conversation ─────── */
+
+interface ExtractedLead {
+  name: string;
+  company?: string;
+  phone?: string;
+  email?: string;
+}
+
+function extractLead(messages: ChatMessage[]): ExtractedLead {
+  const userText = messages
+    .filter((m) => m.role === "user")
+    .map((m) => m.content)
+    .join("\n");
+
+  const emailMatch = userText.match(/[\w.+-]+@[\w-]+\.[\w.-]+/);
+  const phoneMatch = userText.match(
+    /(?:\+?972[-.\s]?|0)5\d[-.\s]?\d{3}[-.\s]?\d{4}/,
+  );
+
+  const firstUserMsg = messages.find((m) => m.role === "user")?.content ?? "";
+  const firstWord = firstUserMsg.trim().split(/[\s,،]+/)[0] ?? "";
+  const name = firstWord.length > 1 && firstWord.length < 40 ? firstWord : "לקוח";
+
+  return {
+    name,
+    phone: phoneMatch?.[0],
+    email: emailMatch?.[0],
+  };
+}
+
+/* ── Phase 2 channels (deferred) ────────────────────────────────────── */
 
 async function sendWhatsApp(summary: string): Promise<void> {
   const base = process.env.WAHA_BASE_URL;
   const to = process.env.WAHA_TO_NUMBER;
   const session = process.env.WAHA_SESSION ?? "default";
-  if (!base || !to) return;
+  if (!base || !to) throw new Error("not_configured");
 
-  await fetch(`${base}/api/sendText`, {
+  const res = await fetch(`${base}/api/sendText`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      ...(process.env.WAHA_API_KEY ? { "X-Api-Key": process.env.WAHA_API_KEY } : {}),
+      ...(process.env.WAHA_API_KEY
+        ? { "X-Api-Key": process.env.WAHA_API_KEY }
+        : {}),
     },
     body: JSON.stringify({ session, chatId: `${to}@c.us`, text: summary }),
   });
+  if (!res.ok) throw new Error(`waha_${res.status}`);
 }
 
-/* ── Notion lead ────────────────────────────────────────────────── */
-
-async function createNotionLead(summary: string, name: string): Promise<void> {
-  const apiKey = process.env.NOTION_API_KEY;
-  const dbId = process.env.NOTION_LEADS_DATABASE_ID;
-  if (!apiKey || !dbId) return;
-
-  await fetch("https://api.notion.com/v1/pages", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-      "Notion-Version": "2022-06-28",
-    },
-    body: JSON.stringify({
-      parent: { database_id: dbId },
-      properties: {
-        Name: { title: [{ text: { content: name || "ליד מצ'אטבוט" } }] },
-        Status: { select: { name: "ליד חדש" } },
-        Source: { select: { name: "צ'אטבוט AI" } },
-        Challenge: { rich_text: [{ text: { content: summary.slice(0, 2000) } }] },
-        Date: { date: { start: new Date().toISOString() } },
-      },
-    }),
-  });
-}
-
-/* ── N8N hook ───────────────────────────────────────────────────── */
-
-async function triggerN8N(summary: string): Promise<void> {
+async function triggerN8N(summary: string, lead: ExtractedLead): Promise<void> {
   const url = process.env.N8N_WEBHOOK_URL;
-  if (!url) return;
+  if (!url) throw new Error("not_configured");
 
-  await fetch(url, {
+  const res = await fetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -105,38 +118,108 @@ async function triggerN8N(summary: string): Promise<void> {
     body: JSON.stringify({
       source: "chatbot",
       summary,
+      lead,
       timestamp: new Date().toISOString(),
     }),
   });
+  if (!res.ok) throw new Error(`n8n_${res.status}`);
 }
 
-/* ── Route handler ──────────────────────────────────────────────── */
+/* ── Logging helpers ─────────────────────────────────────────────────── */
+
+function log(payload: Record<string, unknown>): void {
+  console.log(JSON.stringify(payload));
+}
+
+function logChannel(
+  requestId: string,
+  channel: string,
+  result: PromiseSettledResult<unknown>,
+): void {
+  if (result.status === "fulfilled") {
+    log({ requestId, channel, status: "ok" });
+  } else {
+    log({
+      requestId,
+      channel,
+      status: "fail",
+      error: String(
+        result.reason instanceof Error ? result.reason.message : result.reason,
+      ),
+    });
+  }
+}
+
+/* ── Route handler ──────────────────────────────────────────────────── */
 
 export async function POST(req: NextRequest) {
+  const requestId = crypto.randomUUID();
+
   try {
-    const { messages } = (await req.json()) as {
-      messages: { role: string; content: string }[];
-    };
+    const { messages } = (await req.json()) as { messages: ChatMessage[] };
 
     if (!messages?.length) {
       return NextResponse.json({ error: "אין הודעות" }, { status: 400 });
     }
 
-    // Extract a name heuristically from the first few user messages
-    const firstUserMsg = messages.find((m) => m.role === "user")?.content ?? "";
-    const name = firstUserMsg.split(/[\s,،]/)[0] ?? "לקוח";
+    const extracted = extractLead(messages);
+    log({
+      requestId,
+      event: "lead_received",
+      route: "chat/submit",
+      name: extracted.name,
+      hasEmail: Boolean(extracted.email),
+      hasPhone: Boolean(extracted.phone),
+    });
 
     const summary = await generateSummary(messages);
 
-    await Promise.allSettled([
-      sendWhatsApp(summary),
-      createNotionLead(summary, name),
-      triggerN8N(summary),
-    ]);
+    const leadForNotion: NotionLead = {
+      name: extracted.name,
+      phone: extracted.phone,
+      email: extracted.email,
+      challenge: summary,
+      source: "chatbot",
+      aiSummary: summary,
+    };
 
-    return NextResponse.json({ ok: true, summary });
+    // 1) Notion (canonical, awaited).
+    const notionResult = await createLead(leadForNotion);
+    log({
+      requestId,
+      channel: "notion",
+      status: notionResult.ok ? "ok" : "fail",
+      pageId: notionResult.pageId,
+      error: notionResult.error,
+    });
+
+    // 2) Fan out the rest.
+    const tasks: Array<Promise<unknown>> = [
+      sendLeadNotification(leadForNotion, notionResult.url),
+      sendWhatsApp(summary),
+      triggerN8N(summary, extracted),
+    ];
+    if (extracted.email) {
+      tasks.push(
+        sendLeadConfirmation({ name: extracted.name, email: extracted.email }),
+      );
+    }
+
+    const [notifyRes, whatsappRes, n8nRes, confirmRes] =
+      await Promise.allSettled(tasks);
+
+    logChannel(requestId, "email_notification", notifyRes);
+    logChannel(requestId, "whatsapp", whatsappRes);
+    logChannel(requestId, "n8n", n8nRes);
+    if (confirmRes) logChannel(requestId, "email_confirmation", confirmRes);
+
+    return NextResponse.json({ ok: true, requestId, summary });
   } catch (err) {
-    console.error("[chat/submit] error:", err);
+    log({
+      requestId,
+      event: "unhandled_error",
+      error: err instanceof Error ? err.message : String(err),
+    });
     return NextResponse.json({ error: "שגיאת שרת" }, { status: 500 });
   }
 }

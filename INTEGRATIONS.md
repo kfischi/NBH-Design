@@ -4,28 +4,56 @@
 
 ---
 
-## Architecture Overview
+## What's working today (Phase 1)
 
-```
-Contact Form (Frontend)
-        │
-        ▼
-POST /api/contact  (Next.js API Route)
-        │
-   ┌────┴─────────────────────────────────┐
-   │                                      │
-   ▼                                      ▼
-N8N Webhook                        WAHA (WhatsApp)
-   │                                      │
-   ├── Email (SMTP/Resend)          Nevet's phone 📱
-   ├── CRM (HubSpot/Notion)
-   ├── Slack/Teams notification
-   └── Calendar booking link
+| Channel | Status | Where |
+|---|---|---|
+| ✅ Notion lead creation | **Live** | `src/lib/notion-client.ts` |
+| ✅ Resend confirmation email (to lead) | **Live** | `src/lib/email-client.ts` |
+| ✅ Resend notification email (to Nevet, with Notion link) | **Live** | `src/lib/email-client.ts` |
+| ✅ Health check | **Live** | `GET /api/health` |
+| ⏳ WhatsApp (WAHA) | **Phase 2 — deferred** | Code wired, infra not deployed |
+| ⏳ n8n orchestration | **Phase 2 — deferred** | Code wired, no live instance |
+| ❌ HubSpot | **Removed** | Replaced by Notion |
+
+Required env vars in Netlify for Phase 1 to work:
+- `NOTION_API_KEY`, `NOTION_LEADS_DATABASE_ID`
+- `RESEND_API_KEY`, `EMAIL_FROM`, `EMAIL_TO`
+
+Smoke test the live site:
+```bash
+SITE_URL=https://nbh-engineering.com ./scripts/smoke-test.sh
 ```
 
 ---
 
-## 1. N8N — Workflow Automation
+## Architecture Overview (Phase 1 — what runs today)
+
+```
+Contact Form / Chatbot (Frontend)
+        │
+        ▼
+POST /api/contact  or  POST /api/chat/submit
+        │
+        ├──▶ Notion (canonical lead)            ✅ live
+        ├──▶ Resend → email to Nevet            ✅ live
+        ├──▶ Resend → confirmation to lead      ✅ live (if email captured)
+        ├──▶ n8n webhook                        ⏳ skipped if not configured
+        └──▶ WAHA WhatsApp                      ⏳ skipped if not configured
+```
+
+Every channel is logged with a shared `requestId` (UUID per request) so failures
+can be traced in Netlify logs:
+```
+{"requestId":"...","channel":"notion","status":"ok","pageId":"..."}
+```
+
+---
+
+## 1. N8N — Workflow Automation — ⏳ DEFERRED to Phase 2
+
+> n8n אינו פעיל כרגע. ה-API routes עדיין קוראות ל-`N8N_WEBHOOK_URL` — אם המשתנה
+> אינו מוגדר הן פשוט מדלגות. אין צורך לפרוס n8n לצורך פעולת האתר ב-Phase 1.
 
 N8N הוא ה-orchestrator המרכזי. כל ליד שנכנס עובר דרכו.
 
@@ -91,7 +119,11 @@ SMTP_PASS=your_app_password   # Google → App Passwords
 
 ---
 
-## 3. WhatsApp — WAHA + Coolify
+## 3. WhatsApp — WAHA + Coolify — ⏳ DEFERRED to Phase 2
+
+> WAHA אינו פרוס כרגע. ה-API routes קוראות אליו רק אם `WAHA_BASE_URL` ו-
+> `WAHA_TO_NUMBER` מוגדרים — אחרת מדלגות. ב-Phase 1 ההתראה לנבט מגיעה במייל
+> דרך Resend.
 
 ### מה זה WAHA?
 WhatsApp HTTP API עצמאי (Self-hosted). פועל ב-Docker.
@@ -208,34 +240,41 @@ import Image from "next/image";
 
 ---
 
-## 6. CRM
+## 6. CRM — Notion (canonical, the only CRM)
 
-### Option A — HubSpot (מומלץ לB2B)
-1. הרשמה ב-[hubspot.com](https://hubspot.com) (Free CRM)
-2. Settings → Integrations → API Key → Create
-3. צור Pipeline: "הנדסה" עם שלבים: `ליד חדש → אפיון → הצעת מחיר → סגירה`
+> HubSpot was removed. Notion is the single source of truth for leads.
 
-```env
-HUBSPOT_API_KEY=pat-eu1-xxxxxxxxxxxx
-HUBSPOT_PORTAL_ID=12345678
-```
+### Setup
+1. Create workspace → New Database → "Leads"
+2. Add these columns (names are case-sensitive):
 
-**N8N HubSpot Node:** פעולות אוטומטיות:
-- Create Contact
-- Create Deal → Pipeline
-- Add Note (תוכן האתגר)
+| Column | Type | Required? | Notes |
+|---|---|---|---|
+| Name | Title | ✅ | Lead's full name |
+| Company | Rich text | optional | |
+| Phone | Phone | ✅ | E.164 or local format |
+| Challenge | Rich text | ✅ | Free-text problem description |
+| Status | Select | ✅ | Default option: `ליד חדש` |
+| Source | Select | ✅ | Options: `אתר`, `צ'אטבוט AI` |
+| Date | Date | ✅ | ISO timestamp |
+| AI Score | Number | optional | Lead-quality score 0–100 |
+| AI Summary | Rich text | optional | Generated summary from chatbot |
 
-### Option B — Notion (קל יותר לתחילה)
-1. Create workspace → New Database → "לידים"
-2. עמודות: Name, Company, Phone, Status, Challenge, Date, Source
-3. Settings → Integrations → Create Integration
+3. Settings → Integrations → Create Integration → copy the secret
+4. Open the database → top-right `...` → Connect → select your integration
 
 ```env
 NOTION_API_KEY=secret_xxxxxxxxxxxxxxxxxxxx
 NOTION_LEADS_DATABASE_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
-> הדאטאבייס ID נמצא ב-URL של הדף בנוטיון: `notion.so/workspace/DATABASE_ID?v=...`
+> The database ID is in the URL: `notion.so/workspace/DATABASE_ID?v=...`
+
+### Verifying
+```bash
+curl https://nbh-engineering.com/api/health | jq
+# → { notion: "ok", resend: "ok" }
+```
 
 ---
 
@@ -333,7 +372,6 @@ Expected response: `{ "ok": true }`
 | Cloudinary | Free | Free |
 | N8N (Coolify) | Self-hosted | ~$5/mo VPS |
 | WAHA (Coolify) | Self-hosted | Same VPS |
-| HubSpot CRM | Free | Free |
 | Notion | Free | Free |
 | Resend | Free (3k emails/mo) | Free |
 | **Total** | | **~$5/mo** |
