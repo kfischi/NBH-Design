@@ -12,13 +12,21 @@
 | ✅ Resend confirmation email (to lead) | **Live** | `src/lib/email-client.ts` |
 | ✅ Resend notification email (to Nevet, with Notion link) | **Live** | `src/lib/email-client.ts` |
 | ✅ Health check | **Live** | `GET /api/health` |
+| ✅ Outbound draft generation (Claude → Notion Drafts) | **Live** | `POST /api/outbound/generate-drafts` |
+| ✅ Outbound reply webhook → Notion + email | **Live** | `POST /api/outbound/reply` |
+| ✅ Admin draft review queue | **Live** | `/admin/outbound` (Basic Auth) |
 | ⏳ WhatsApp (WAHA) | **Phase 2 — deferred** | Code wired, infra not deployed |
 | ⏳ n8n orchestration | **Phase 2 — deferred** | Code wired, no live instance |
 | ❌ HubSpot | **Removed** | Replaced by Notion |
 
-Required env vars in Netlify for Phase 1 to work:
+Required env vars in Netlify for inbound (Phase 1) to work:
 - `NOTION_API_KEY`, `NOTION_LEADS_DATABASE_ID`
 - `RESEND_API_KEY`, `EMAIL_FROM`, `EMAIL_TO`
+
+Additional env vars for outbound (see § 8):
+- `NOTION_OUTBOUND_TARGETS_DB_ID`, `NOTION_OUTBOUND_DRAFTS_DB_ID`
+- `OUTBOUND_TRIGGER_SECRET`
+- `ADMIN_BASIC_USER`, `ADMIN_BASIC_PASSWORD`
 
 Smoke test the live site:
 ```bash
@@ -282,13 +290,27 @@ curl https://nbh-engineering.com/api/health | jq
 
 ### Architecture
 ```
-/admin/*          — Protected routes (NextAuth)
-/admin/leads      — רשימת לידים (מ-Notion/HubSpot API)
-/admin/projects   — ניהול מקרי בוחן
-/admin/media      — Cloudinary gallery
+/admin/outbound   — תור הטיוטות outbound (live)        ✅
+/admin/leads      — רשימת לידים מ-Notion               ⏳ planned
+/admin/projects   — ניהול מקרי בוחן                    ⏳ planned
+/admin/media      — Cloudinary gallery                  ⏳ planned
 ```
 
-### Authentication — NextAuth.js
+### Authentication today — HTTP Basic Auth via middleware
+
+NextAuth is documented below but isn't wired up. As a temporary measure,
+`src/middleware.ts` enforces HTTP Basic Auth on every `/admin/*` request.
+Set these in Netlify:
+
+```env
+ADMIN_BASIC_USER=nevet
+ADMIN_BASIC_PASSWORD=<strong-password>
+```
+
+When NextAuth is wired up, replace `src/middleware.ts` with the NextAuth
+middleware shown below and delete `ADMIN_BASIC_*`.
+
+### Authentication (planned) — NextAuth.js
 ```bash
 npm install next-auth
 ```
@@ -331,6 +353,114 @@ export const { handlers, auth } = NextAuth({
   pages: { signIn: "/admin/login" },
 });
 ```
+
+---
+
+## 8. Outbound LinkedIn pipeline
+
+> Inbound captures leads. Outbound generates them. Nevet adds prospects to a
+> Notion DB; a daily cron asks Claude to draft a personalized opener; drafts
+> sit in `/admin/outbound` for one-click approval; the third-party LinkedIn
+> tool sends them. We never auto-send.
+
+### Architecture
+
+```
+Notion: Outbound Targets   ← Nevet adds rows manually
+        │
+        ↓ 09:00 IL, Mon–Fri (GitHub Actions cron)
+POST /api/outbound/generate-drafts
+        │  (Claude opus-4-7)
+        ↓
+Notion: Outbound Drafts (status=draft)
+        │
+        ↓ Nevet reviews at /admin/outbound, approves in Notion, exports
+External LinkedIn tool (Waalaxy / Heyreach / similar)
+        │
+        ↓ on prospect reply (webhook)
+POST /api/outbound/reply
+        ├──▶ Notion: target.status = replied + comment with reply text
+        └──▶ Resend: notification email to Nevet
+```
+
+### Notion DB 1 — `Outbound Targets`
+
+Create this database in Notion. Column names are **case-sensitive**:
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| Name | Title | ✅ | Person's full name |
+| Title | Rich text | optional | "VP R&D", "CTO", etc. |
+| Company | Rich text | optional | |
+| Industry | Select | optional | Options: `defense`, `agritech`, `industry`, `other` |
+| LinkedIn URL | URL | optional | |
+| Email | Email | optional | |
+| Notes | Rich text | optional | Why they're a fit, public posts, projects |
+| Status | Select | ✅ | Options: `new`, `researched`, `ready_for_outreach`, `draft_ready`, `approved`, `sent`, `replied`, `closed` |
+| Date Added | Date | ✅ | |
+| Last Contact | Date | optional | Auto-stamped when a reply is logged |
+
+### Notion DB 2 — `Outbound Drafts`
+
+| Column | Type | Required | Notes |
+|---|---|---|---|
+| Subject | Title | ✅ | Short internal name like `Avi Cohen — touch 1` |
+| Target | Relation → Outbound Targets | ✅ | |
+| Channel | Select | ✅ | Options: `linkedin_dm`, `linkedin_inmail`, `email` |
+| Touch # | Number | ✅ | 1, 2, 3 (sequence position) |
+| Draft Body | Rich text | ✅ | The message itself |
+| Status | Select | ✅ | Options: `draft`, `approved`, `sent`, `replied` |
+| Generated At | Date | ✅ | Auto-set by the API |
+| Approved At | Date | optional | Set manually when Nevet approves |
+| Notes | Rich text | optional | AI's personalization rationale |
+
+> Both databases must be **connected** to the same Notion integration as
+> the Leads database (`··· → Connections → Add the integration`).
+
+### Env vars (Netlify)
+
+```env
+NOTION_OUTBOUND_TARGETS_DB_ID=...
+NOTION_OUTBOUND_DRAFTS_DB_ID=...
+OUTBOUND_TRIGGER_SECRET=$(openssl rand -hex 32)
+ADMIN_BASIC_USER=nevet
+ADMIN_BASIC_PASSWORD=<strong-password>
+```
+
+Reuses from § 6: `NOTION_API_KEY`. Reuses from § 2: `RESEND_API_KEY`,
+`EMAIL_FROM`, `EMAIL_TO`. Reuses globally: `ANTHROPIC_API_KEY`.
+
+### GitHub Actions secrets
+
+The cron at `.github/workflows/outbound-daily.yml` needs two repo secrets:
+
+| Secret | Value |
+|---|---|
+| `SITE_URL` | `https://nbh-engineering.com` |
+| `OUTBOUND_TRIGGER_SECRET` | Same value as in Netlify env |
+
+Add at: GitHub → repo → Settings → Secrets and variables → Actions → New
+repository secret.
+
+The workflow is also triggerable manually: Actions tab → "Outbound — Daily
+draft generation" → Run workflow. You can pass `dryRun=true` and a custom
+`limit` to test without writing to Notion.
+
+### LinkedIn tool setup (Waalaxy / Heyreach / similar)
+
+1. Export approved drafts from Notion (filter `Status = approved`).
+2. In your LinkedIn tool, create a campaign and paste each draft body.
+3. Configure the tool's reply webhook to POST to:
+   ```
+   POST https://nbh-engineering.com/api/outbound/reply
+   Header: X-Outbound-Secret: <OUTBOUND_TRIGGER_SECRET>
+   Body:   { "targetId": "<notion-page-id>", "replyText": "...", "repliedAt": "ISO" }
+   ```
+4. The Notion page ID is the Target's row id — copy it from the URL of
+   the target page in Notion.
+
+If your LinkedIn tool can't pass `targetId`, you can call this endpoint
+manually whenever a reply comes in.
 
 ---
 
