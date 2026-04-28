@@ -360,57 +360,63 @@ export default function ProjectPageClient({
       {/* ══════════════════════════════════════
           STATS
       ══════════════════════════════════════ */}
-      <Section className="bg-slate-950 py-20">
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="text-center mb-10">
-            <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest mb-3 block">
-              תוצאות
-            </span>
-            <h2 className="text-3xl font-extrabold text-white">
-              המספרים מדברים בעד עצמם
-            </h2>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {project.stats.map((s, i) => (
-              <div
-                key={i}
-                className="text-center p-6 rounded-2xl bg-slate-800/50 border border-slate-700/50 hover:border-emerald-500/30 transition-colors"
-              >
-                <div className="text-4xl lg:text-5xl font-extrabold text-white leading-none mb-2">
-                  {s.value}
-                  <span className="text-emerald-400">{s.suffix}</span>
+      {project.stats.length > 0 && (
+        <Section className="bg-slate-950 py-20">
+          <div className="max-w-5xl mx-auto px-6">
+            <div className="text-center mb-10">
+              <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest mb-3 block">
+                תוצאות
+              </span>
+              <h2 className="text-3xl font-extrabold text-white">
+                המספרים מדברים בעד עצמם
+              </h2>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {project.stats.map((s, i) => (
+                <div
+                  key={i}
+                  className="text-center p-6 rounded-2xl bg-slate-800/50 border border-slate-700/50 hover:border-emerald-500/30 transition-colors"
+                >
+                  <div className="text-4xl lg:text-5xl font-extrabold text-white leading-none mb-2">
+                    {s.value}
+                    <span className="text-emerald-400">{s.suffix}</span>
+                  </div>
+                  <p className="text-slate-400 text-xs leading-relaxed">{s.label}</p>
                 </div>
-                <p className="text-slate-400 text-xs leading-relaxed">{s.label}</p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </Section>
+        </Section>
+      )}
 
       {/* ══════════════════════════════════════
           QUOTE
       ══════════════════════════════════════ */}
-      <Section className="bg-white py-20 lg:py-24">
-        <div className="max-w-3xl mx-auto px-6 text-center">
-          <Quote className="w-10 h-10 text-slate-200 mx-auto mb-6" />
-          <blockquote className="text-2xl lg:text-3xl font-bold text-slate-900 leading-relaxed mb-8">
-            &ldquo;{project.quote.text}&rdquo;
-          </blockquote>
-          <div className="flex items-center justify-center gap-3">
-            <div className="w-11 h-11 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-md">
-              <span className="text-white font-bold">
-                {project.quote.author[0]}
-              </span>
-            </div>
-            <div className="text-right">
-              <div className="font-bold text-slate-900 text-sm">
-                {project.quote.author}
+      {project.quote.text && (
+        <Section className="bg-white py-20 lg:py-24">
+          <div className="max-w-3xl mx-auto px-6 text-center">
+            <Quote className="w-10 h-10 text-slate-200 mx-auto mb-6" />
+            <blockquote className="text-2xl lg:text-3xl font-bold text-slate-900 leading-relaxed mb-8">
+              &ldquo;{project.quote.text}&rdquo;
+            </blockquote>
+            {project.quote.author && (
+              <div className="flex items-center justify-center gap-3">
+                <div className="w-11 h-11 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-md">
+                  <span className="text-white font-bold">
+                    {project.quote.author[0]}
+                  </span>
+                </div>
+                <div className="text-right">
+                  <div className="font-bold text-slate-900 text-sm">
+                    {project.quote.author}
+                  </div>
+                  <div className="text-slate-500 text-xs">{project.quote.role}</div>
+                </div>
               </div>
-              <div className="text-slate-500 text-xs">{project.quote.role}</div>
-            </div>
+            )}
           </div>
-        </div>
-      </Section>
+        </Section>
+      )}
 
       {/* ══════════════════════════════════════
           TECH STACK
