@@ -16,7 +16,7 @@ import Anthropic from "@anthropic-ai/sdk";
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-const SYSTEM_PROMPT = `אתה יועץ פרויקטים AI של NBH Engineering Solutions, חברת הנדסה מקצועית ישראלית.
+const SYSTEM_PROMPT = `אתה יועץ פרויקטים AI של Proto-Model, חברת הנדסה מקצועית ישראלית.
 מטרתך: לנהל שיחת קבלה חכמה עם לקוח פוטנציאלי ולאסוף את כל המידע הנחוץ לפתיחת פרויקט.
 
 ## כללי שיחה
@@ -39,12 +39,12 @@ const SYSTEM_PROMPT = `אתה יועץ פרויקטים AI של NBH Engineering 
 ## מתי לסיים
 כאשר ענית על לפחות 5 מהנושאים למעלה (כולל שם וטלפון):
 1. כתוב משפט חיובי שמסכם שקיבלת מספיק מידע
-2. הבטח שנבט מ-NBH Engineering יחזור אליהם תוך 24 שעות
+2. הבטח שנבט מ-Proto-Model יחזור אליהם תוך 24 שעות
 3. הוסף בשורה נפרדת בסוף ההודעה בדיוק את הטוקן הבא (אל תסביר אותו, פשוט הוסף אותו):
 [INTAKE_COMPLETE]
 
 ## דוגמת פתיחה
-"שלום! אני יועץ הפרויקטים של NBH Engineering. אשמח לעזור לך להתחיל את הפרויקט 🏗️
+"שלום! אני יועץ הפרויקטים של Proto-Model. אשמח לעזור לך להתחיל את הפרויקט 🏗️
 ספר לי קצת — מה שמך ועם איזו חברה אתה עובד?"`;
 
 export async function POST(req: NextRequest) {

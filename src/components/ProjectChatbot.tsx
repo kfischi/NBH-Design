@@ -24,7 +24,7 @@ interface Message {
 const GREETING: Message = {
   role: "assistant",
   content:
-    "שלום! אני יועץ הפרויקטים של NBH Engineering 🏗️\nאשמח לעזור לך להתחיל את הפרויקט.\n\nספר לי — מה שמך ועם איזו חברה אתה עובד?",
+    "שלום! אני יועץ הפרויקטים של Proto-Model 🏗️\nאשמח לעזור לך להתחיל את הפרויקט.\n\nספר לי — מה שמך ועם איזו חברה אתה עובד?",
 };
 
 /* ── Progress steps ─────────────────────────────────────────────── */
@@ -129,8 +129,8 @@ export default function ProjectChatbot() {
   /* Listen for the global open event dispatched by Hero / Header */
   useEffect(() => {
     const handler = () => setOpen(true);
-    window.addEventListener("nbh:open-chatbot", handler);
-    return () => window.removeEventListener("nbh:open-chatbot", handler);
+    window.addEventListener("proto-model:open-chatbot", handler);
+    return () => window.removeEventListener("proto-model:open-chatbot", handler);
   }, []);
 
   /* ── Send ──────────────────────────────────────────────────────── */
@@ -288,7 +288,7 @@ export default function ProjectChatbot() {
                         יועץ פרויקטים AI
                       </p>
                       <p className="text-[11px] text-indigo-200 font-medium">
-                        NBH Engineering · זמין עכשיו
+                        Proto-Model · זמין עכשיו
                       </p>
                     </div>
                   </div>
@@ -462,7 +462,7 @@ export default function ProjectChatbot() {
 
                 {/* Footer */}
                 <p className="text-[10px] text-slate-300 text-center mt-2 tracking-wide">
-                  מופעל על ידי Claude AI · NBH Engineering
+                  מופעל על ידי Claude AI · Proto-Model
                 </p>
               </div>
             )}

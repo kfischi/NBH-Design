@@ -48,7 +48,7 @@ export default function AccessibilityWidget() {
 
   useEffect(() => {
     try {
-      const saved = localStorage.getItem("nbh-accessibility");
+      const saved = localStorage.getItem("proto-model-accessibility");
       if (saved) {
         const parsed = JSON.parse(saved) as Settings;
         setSettings(parsed);
@@ -61,13 +61,13 @@ export default function AccessibilityWidget() {
     const next = { ...settings, [key]: !settings[key] };
     setSettings(next);
     applySettings(next);
-    try { localStorage.setItem("nbh-accessibility", JSON.stringify(next)); } catch {}
+    try { localStorage.setItem("proto-model-accessibility", JSON.stringify(next)); } catch {}
   };
 
   const reset = () => {
     setSettings(defaultSettings);
     applySettings(defaultSettings);
-    try { localStorage.removeItem("nbh-accessibility"); } catch {}
+    try { localStorage.removeItem("proto-model-accessibility"); } catch {}
   };
 
   const anyActive = Object.values(settings).some(Boolean);

@@ -62,7 +62,7 @@ async function sendWhatsApp(payload: ContactPayload): Promise<void> {
   if (!base || !to) throw new Error("not_configured");
 
   const text =
-    `🔔 *ליד חדש — NBH Engineering*\n\n` +
+    `🔔 *ליד חדש — Proto-Model*\n\n` +
     `👤 *שם:* ${payload.name}\n` +
     `🏢 *חברה:* ${payload.company || "לא צוין"}\n` +
     `📱 *טלפון:* ${payload.phone}\n\n` +

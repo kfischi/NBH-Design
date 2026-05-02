@@ -27,7 +27,7 @@ function unauthorized(): NextResponse {
   return new NextResponse("Authentication required", {
     status: 401,
     headers: {
-      "WWW-Authenticate": 'Basic realm="NBH Admin", charset="UTF-8"',
+      "WWW-Authenticate": 'Basic realm="Proto-Model Admin", charset="UTF-8"',
     },
   });
 }

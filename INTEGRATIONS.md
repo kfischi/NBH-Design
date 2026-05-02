@@ -1,4 +1,4 @@
-# NBH Engineering Solutions — Integrations & API Setup
+# Proto-Model — Integrations & API Setup
 
 > כל ה-API Keys והגדרות שצריך לחבר לפני העלאה לפרודקשן.
 
@@ -30,7 +30,7 @@ Additional env vars for outbound (see § 8):
 
 Smoke test the live site:
 ```bash
-SITE_URL=https://nbh-engineering.com ./scripts/smoke-test.sh
+SITE_URL=https://proto-model.com ./scripts/smoke-test.sh
 ```
 
 ---
@@ -69,12 +69,12 @@ N8N הוא ה-orchestrator המרכזי. כל ליד שנכנס עובר דרכ�
 | Field | Value |
 |-------|-------|
 | **Method** | POST |
-| **Path** | `/webhook/nbh-contact` |
+| **Path** | `/webhook/proto-model-contact` |
 | **Authentication** | Header `x-webhook-secret` |
 
 ### ENV Variables
 ```env
-N8N_WEBHOOK_URL=https://n8n.your-domain.com/webhook/nbh-contact
+N8N_WEBHOOK_URL=https://n8n.your-domain.com/webhook/proto-model-contact
 N8N_WEBHOOK_SECRET=your_secret
 ```
 
@@ -101,13 +101,13 @@ N8N_WEBHOOK_SECRET=your_secret
 
 ### Option A — Resend (מומלץ)
 1. הרשמה ב-[resend.com](https://resend.com)
-2. אמת דומיין (`nbh-engineering.com`) → Add DNS records
+2. אמת דומיין (`proto-model.com`) → Add DNS records
 3. צור API Key
 
 ```env
 RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxx
-EMAIL_FROM=nevet@nbh-engineering.com
-EMAIL_TO=nevet@nbh-engineering.com
+EMAIL_FROM=nevet@proto-model.com
+EMAIL_TO=nevet@proto-model.com
 ```
 
 ### Option B — SMTP (Gmail / Zoho)
@@ -185,7 +185,7 @@ sendWhatsApp() → WAHA API → WhatsApp message to Nevet
 
 ### Setup
 1. Push repo to GitHub
-2. New site → Import from GitHub → `NBH-Design`
+2. New site → Import from GitHub → `Proto-Model-Design`
 3. Build settings:
    - **Build command:** `npm run build`
    - **Publish directory:** `.next`
@@ -218,16 +218,16 @@ NETLIFY_DEPLOY_HOOK=https://api.netlify.com/build_hooks/YOUR_HOOK_ID
 ### Setup
 1. הרשמה ב-[cloudinary.com](https://cloudinary.com)
 2. Dashboard → Settings → Upload → Add Upload Preset
-   - Name: `nbh_portfolio`
+   - Name: `proto_model_portfolio`
    - Signing: **Unsigned** (לעלאות מהאתר)
-   - Folder: `nbh-projects`
+   - Folder: `proto-model-projects`
 
 ### ENV Variables
 ```env
 NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
-NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=nbh_portfolio
+NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=proto_model_portfolio
 ```
 
 ### שימוש מרכזי
@@ -239,7 +239,7 @@ NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=nbh_portfolio
 // Example usage in components
 import Image from "next/image";
 <Image
-  src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/v1/nbh-projects/project-name.jpg`}
+  src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/v1/proto-model-projects/project-name.jpg`}
   alt="Project"
   width={800}
   height={600}
@@ -280,7 +280,7 @@ NOTION_LEADS_DATABASE_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 ### Verifying
 ```bash
-curl https://nbh-engineering.com/api/health | jq
+curl https://proto-model.com/api/health | jq
 # → { notion: "ok", resend: "ok" }
 ```
 
@@ -316,9 +316,9 @@ npm install next-auth
 ```
 
 ```env
-NEXTAUTH_URL=https://nbh-engineering.com
+NEXTAUTH_URL=https://proto-model.com
 NEXTAUTH_SECRET=run: openssl rand -base64 32
-ADMIN_EMAIL=admin@nbh-engineering.com
+ADMIN_EMAIL=admin@proto-model.com
 ADMIN_PASSWORD_HASH=run: node -e "require('bcrypt').hash('your_pass',12,console.log)"
 ```
 
@@ -436,7 +436,7 @@ The cron at `.github/workflows/outbound-daily.yml` needs two repo secrets:
 
 | Secret | Value |
 |---|---|
-| `SITE_URL` | `https://nbh-engineering.com` |
+| `SITE_URL` | `https://proto-model.com` |
 | `OUTBOUND_TRIGGER_SECRET` | Same value as in Netlify env |
 
 Add at: GitHub → repo → Settings → Secrets and variables → Actions → New
@@ -452,7 +452,7 @@ draft generation" → Run workflow. You can pass `dryRun=true` and a custom
 2. In your LinkedIn tool, create a campaign and paste each draft body.
 3. Configure the tool's reply webhook to POST to:
    ```
-   POST https://nbh-engineering.com/api/outbound/reply
+   POST https://proto-model.com/api/outbound/reply
    Header: X-Outbound-Secret: <OUTBOUND_TRIGGER_SECRET>
    Body:   { "targetId": "<notion-page-id>", "replyText": "...", "repliedAt": "ISO" }
    ```

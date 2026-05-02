@@ -36,7 +36,7 @@ async function generateSummary(messages: ChatMessage[]): Promise<string> {
 צור סיכום קצר וברור בעברית בפורמט ווטסאפ (כוכביות לבולד).
 כלול: שם + חברה, סוג פרויקט, מיקום/גודל, לוח זמנים, תקציב, אתגר/בעיה, טלפון.
 אם מידע חסר — ציין "לא צוין".
-פתח ב: 🏗️ *סיכום פרויקט — NBH Engineering*`,
+פתח ב: 🏗️ *סיכום פרויקט — Proto-Model*`,
     messages: [
       {
         role: "user",

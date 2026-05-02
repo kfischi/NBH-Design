@@ -17,7 +17,7 @@ import { Resend } from "resend";
 import type { NotionLead } from "@/lib/notion-client";
 
 const BRAND = {
-  name: "NBH Engineering Solutions",
+  name: "Proto-Model",
   primary: "#6366f1",
   secondary: "#8b5cf6",
   accent: "#06b6d4",
@@ -105,7 +105,7 @@ export async function sendLeadConfirmation(lead: {
     const { data, error } = await resend.emails.send({
       from,
       to: [lead.email],
-      subject: "קיבלנו את הפנייה שלך — NBH Engineering",
+      subject: "קיבלנו את הפנייה שלך — Proto-Model",
       html: shellHtml(inner),
     });
     if (error) return { ok: false, error: error.message };

@@ -62,7 +62,7 @@ export default function PainPoints() {
             .
             <br />
             <span className="text-slate-400 font-light">
-              וכך נראה עם NBH.
+              וכך נראה עם Proto-Model.
             </span>
           </h2>
           <p className="text-slate-500 text-lg max-w-xl mx-auto">
@@ -87,7 +87,7 @@ export default function PainPoints() {
             <div className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0">
               <Check className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />
             </div>
-            <span className="text-sm font-bold text-emerald-700">עם NBH — כך זה עובד</span>
+            <span className="text-sm font-bold text-emerald-700">עם Proto-Model — כך זה עובד</span>
           </div>
         </motion.div>
 
@@ -136,7 +136,7 @@ export default function PainPoints() {
           className="mt-14 text-center"
         >
           <p className="text-slate-400 text-sm mb-5">
-            כל אחת מהסיטואציות האלה עלתה ללקוח זמן וכסף. NBH נולד כדי לסגור אותן.
+            כל אחת מהסיטואציות האלה עלתה ללקוח זמן וכסף. Proto-Model נולד כדי לסגור אותן.
           </p>
           <Link href="/contact">
             <motion.span

@@ -4,7 +4,7 @@
  * Dynamic Open Graph image (1200×630) for the site. Replaces a missing
  * static `/og-image.jpg` so social shares stop 404-ing.
  *
- * Brand-gradient panel with the NBH mark + Hebrew title. Heebo is loaded
+ * Brand-gradient panel with the Proto-Model mark + Hebrew title. Heebo is loaded
  * at request time from Google's CSS endpoint; if the fetch fails we still
  * render — Hebrew text just falls back to the default sans-serif.
  *
@@ -17,7 +17,7 @@ export const dynamic = "force-static";
 export const revalidate = 3600;
 
 const HEBREW_GLYPHS =
-  "NBH Engineering Solutionsהנדסה רב־תחומיתמכניקה אלקטרוניקה אוטומציהתחת קורת גג אחתזמין לפרויקטים חדשיםgivat-haim israelnbh-engineering.commultidisciplinary product engineering·";
+  "Proto-Modelהנדסה רב־תחומיתמכניקה אלקטרוניקה אוטומציהתחת קורת גג אחתזמין לפרויקטים חדשיםgivat-haim israelproto-model.commultidisciplinary product engineeringמחלום למציאותPM·";
 
 async function loadHeebo(weight: 400 | 800): Promise<ArrayBuffer | null> {
   try {
@@ -125,22 +125,22 @@ export async function GET(): Promise<Response> {
                 letterSpacing: -1,
               }}
             >
-              NBH
+              PM
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
               <span
                 style={{
-                  fontSize: 22,
+                  fontSize: 26,
                   fontWeight: 800,
                   letterSpacing: 0.5,
                   textTransform: "uppercase",
                   opacity: 0.92,
                 }}
               >
-                NBH Engineering Solutions
+                Proto-Model
               </span>
-              <span style={{ fontSize: 18, opacity: 0.75, fontWeight: 400 }}>
-                multidisciplinary product engineering
+              <span style={{ fontSize: 18, opacity: 0.78, fontWeight: 400 }}>
+                מחלום למציאות
               </span>
             </div>
           </div>
@@ -221,7 +221,7 @@ export async function GET(): Promise<Response> {
             />
             זמין לפרויקטים חדשים
           </span>
-          <span>nbh-engineering.com</span>
+          <span>proto-model.com</span>
         </div>
       </div>
     ),

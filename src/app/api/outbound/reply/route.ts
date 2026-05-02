@@ -93,7 +93,7 @@ async function sendReplyNotification(args: {
         ${linkedInLink}
       </p>
     </td></tr>
-    <tr><td style="padding:18px 28px;background:#f1f5f9;color:#64748b;font-size:12px;">NBH Engineering Solutions · Outbound Pipeline</td></tr>
+    <tr><td style="padding:18px 28px;background:#f1f5f9;color:#64748b;font-size:12px;">Proto-Model · Outbound Pipeline</td></tr>
   </table>
 </body></html>`;
 

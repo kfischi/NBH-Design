@@ -24,7 +24,7 @@ import {
 
 export const dynamic = "force-dynamic";
 export const metadata = {
-  title: "Outbound · NBH Admin",
+  title: "Outbound · Proto-Model Admin",
   robots: { index: false, follow: false },
 };
 
@@ -271,7 +271,7 @@ export default async function AdminOutboundPage() {
             <div>
               <span className="inline-flex items-center gap-2 px-3 py-1 bg-white/15 backdrop-blur rounded-full text-xs font-semibold tracking-wider uppercase">
                 <Sparkles className="w-3.5 h-3.5" />
-                NBH · Outbound
+                Proto-Model · Outbound
               </span>
               <h1 className="mt-4 text-3xl sm:text-4xl font-extrabold tracking-tight">
                 תור הטיוטות

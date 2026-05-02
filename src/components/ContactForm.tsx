@@ -29,7 +29,7 @@ const contactInfo = [
   {
     icon: Mail,
     label: "אימייל",
-    value: "nevet@nbh-engineering.com",
+    value: "nevet@proto-model.com",
     color: "bg-blue-50 text-blue-600",
   },
   {
@@ -52,7 +52,7 @@ const trustBadges = [
 ];
 
 function openChatbot() {
-  window.dispatchEvent(new CustomEvent("nbh:open-chatbot"));
+  window.dispatchEvent(new CustomEvent("proto-model:open-chatbot"));
 }
 
 type Mode = "form" | "chatbot";

@@ -31,7 +31,7 @@ jobs:
       - name: Build (dry run)
         run: npm run build
         env:
-          NEXT_PUBLIC_SITE_URL: https://nbh-engineering.com
+          NEXT_PUBLIC_SITE_URL: https://proto-model.com
           NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: placeholder
 
       - name: Comment build status on PR

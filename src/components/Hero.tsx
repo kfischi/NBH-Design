@@ -18,7 +18,7 @@ const itemVariants = {
 
 /* Open the chatbot from anywhere via a custom event */
 function openChatbot() {
-  window.dispatchEvent(new CustomEvent("nbh:open-chatbot"));
+  window.dispatchEvent(new CustomEvent("proto-model:open-chatbot"));
 }
 
 export default function Hero() {

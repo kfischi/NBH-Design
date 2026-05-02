@@ -56,7 +56,7 @@ export default function Footer() {
                 </motion.span>
               </Link>
               <motion.a
-                href={`https://wa.me/${WHATSAPP_NUMBER}?text=שלום, אני מעוניין לשמוע עוד על שירותי ה-NBH Engineering`}
+                href={`https://wa.me/${WHATSAPP_NUMBER}?text=שלום, אני מעוניין לשמוע עוד על שירותי ה-Proto-Model`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 px-6 py-3.5 bg-[#25D366]/15 border border-[#25D366]/30 text-[#4ade80] font-semibold rounded-full whitespace-nowrap"
@@ -80,8 +80,8 @@ export default function Footer() {
           <div className="md:col-span-2 text-right">
             <div className="flex items-center gap-2.5 justify-end mb-5">
               <div className="flex flex-col leading-none">
-                <span className="font-bold text-white text-lg tracking-tight">NBH</span>
-                <span className="text-[10px] font-medium text-slate-500 tracking-wider uppercase">Engineering Solutions</span>
+                <span className="font-bold text-white text-lg tracking-tight">Proto-Model</span>
+                <span className="text-[10px] font-medium text-slate-500 tracking-wider">מחלום למציאות</span>
               </div>
               <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center">
                 <Zap className="w-4.5 h-4.5 text-white" strokeWidth={2.5} />
@@ -103,7 +103,7 @@ export default function Footer() {
 
             <div className="flex gap-3 justify-end">
               <a
-                href="mailto:nevet@nbh-engineering.com"
+                href="mailto:nevet@proto-model.com"
                 className="w-9 h-9 rounded-xl bg-slate-800 hover:bg-indigo-600 flex items-center justify-center transition-colors"
                 title="אימייל"
               >
@@ -170,7 +170,7 @@ export default function Footer() {
           </div>
 
           <p className="text-slate-500 text-xs">
-            © {new Date().getFullYear()} NBH Engineering Solutions
+            © {new Date().getFullYear()} Proto-Model
           </p>
         </div>
       </div>

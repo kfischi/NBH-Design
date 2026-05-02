@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# NBH Engineering — production smoke test for the lead pipeline.
+# Proto-Model — production smoke test for the lead pipeline.
 #
 # Usage:
-#   SITE_URL=https://nbh-engineering.com ./scripts/smoke-test.sh
+#   SITE_URL=https://proto-model.com ./scripts/smoke-test.sh
 #
 # What it does:
 #   1. GET /api/health                       → expect 200, both services "ok"
@@ -22,7 +22,7 @@ red()    { printf "\033[31m%s\033[0m\n" "$*"; }
 green()  { printf "\033[32m%s\033[0m\n" "$*"; }
 yellow() { printf "\033[33m%s\033[0m\n" "$*"; }
 
-echo "=== NBH smoke test → $SITE_URL ==="
+echo "=== Proto-Model smoke test → $SITE_URL ==="
 
 # --- 1. Health check ---
 echo

@@ -15,11 +15,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { triggerWebhook } from "@/lib/n8n-client";
 
 const WORKFLOW_PATHS: Record<string, string> = {
-  "lead-ai-agent":   "nbh-lead-agent",
-  "content-update":  "nbh-content-update",
-  "weekly-report":   "nbh-weekly-report",
-  "deploy-prod":     "nbh-deploy-production",
-  "deploy-staging":  "nbh-deploy-staging",
+  "lead-ai-agent":   "proto-model-lead-agent",
+  "content-update":  "proto-model-content-update",
+  "weekly-report":   "proto-model-weekly-report",
+  "deploy-prod":     "proto-model-deploy-production",
+  "deploy-staging":  "proto-model-deploy-staging",
 };
 
 function isAuthorized(req: NextRequest): boolean {

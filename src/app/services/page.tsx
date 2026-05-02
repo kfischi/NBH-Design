@@ -13,12 +13,12 @@ import {
 import Link from "next/link";
 
 const comparisons = [
-  { feature: "כיסוי מלא מכניקה + אלקטרוניקה + תוכנה", nbh: true, others: false },
-  { feature: "ספק יחיד לכל מחזור הפיתוח",              nbh: true, others: false },
-  { feature: "תקשורת ישירה עם המהנדס המבצע",           nbh: true, others: false },
-  { feature: "ניסיון בפרויקטי ביטחון מסווגים",         nbh: true, others: false },
-  { feature: "אב-טיפוס מהיר בתלת-מימד On-site",        nbh: true, others: false },
-  { feature: "אחריות מלאה על אינטגרציה בין תחומים",    nbh: true, others: false },
+  { feature: "כיסוי מלא מכניקה + אלקטרוניקה + תוכנה", proto: true, others: false },
+  { feature: "ספק יחיד לכל מחזור הפיתוח",              proto: true, others: false },
+  { feature: "תקשורת ישירה עם המהנדס המבצע",           proto: true, others: false },
+  { feature: "ניסיון בפרויקטי ביטחון מסווגים",         proto: true, others: false },
+  { feature: "אב-טיפוס מהיר בתלת-מימד On-site",        proto: true, others: false },
+  { feature: "אחריות מלאה על אינטגרציה בין תחומים",    proto: true, others: false },
 ];
 
 const technologies = [
@@ -92,7 +92,7 @@ function PageHero() {
           </h1>
 
           <p className="text-lg text-slate-400 max-w-2xl mx-auto leading-relaxed mb-10">
-            בניגוד לספקים שמתמחים בתחום בודד, NBH מציעה מענה אינטגרטיבי — מהרעיון הראשוני ועד
+            בניגוד לספקים שמתמחים בתחום בודד, Proto-Model מציעה מענה אינטגרטיבי — מהרעיון הראשוני ועד
             לאב-הטיפוס הסופי, ללא נקודות עיוורות ביניים.
           </p>
 
@@ -216,10 +216,10 @@ function ComparisonSection() {
           className="text-center mb-12"
         >
           <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-semibold rounded-full mb-4">
-            למה NBH?
+            למה Proto-Model?
           </span>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4">
-            NBH מול ספקים רגילים
+            Proto-Model מול ספקים רגילים
           </h2>
           <p className="text-slate-500">
             ההבדל הוא לא רק ביכולות — הוא בחיסכון הזמן, הסיכון והכסף שתשלם כשתצטרך לתאם בין ספקים
@@ -240,7 +240,7 @@ function ComparisonSection() {
                 <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center">
                   <span className="text-[10px] font-black">N</span>
                 </div>
-                NBH
+                Proto-Model
               </div>
             </div>
             <div className="p-4 text-center">ספקים רגילים</div>
@@ -256,7 +256,7 @@ function ComparisonSection() {
             >
               <div className="p-4 text-sm text-slate-700 text-right">{row.feature}</div>
               <div className="p-4 flex justify-center items-center border-r border-l border-slate-100">
-                {row.nbh ? (
+                {row.proto ? (
                   <CheckCircle className="w-5 h-5 text-green-500" />
                 ) : (
                   <X className="w-5 h-5 text-red-400" />

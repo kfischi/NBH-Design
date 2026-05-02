@@ -1,13 +1,14 @@
 /**
- * SEO Utilities — NBH Engineering Solutions
+ * SEO Utilities — Proto-Model
  * Centralized metadata, structured data, and canonical URL helpers.
  */
 
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://nbh-engineering.com";
-export const SITE_NAME = "NBH Engineering Solutions";
+export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://proto-model.com";
+export const SITE_NAME = "Proto-Model";
+export const SITE_TAGLINE = "מחלום למציאות";
 export const SITE_DESCRIPTION =
-  "פתרונות הנדסיים רב-תחומיים — מכניקה, אלקטרוניקה ומיכון — תחת קורת גג אחת. 12+ שנות ניסיון, 50+ פרויקטים, 3 פטנטים.";
-export const SITE_TWITTER = "@NBHEngineering";
+  "מחלום למציאות — פתרונות הנדסיים רב-תחומיים: מכניקה, אלקטרוניקה ומיכון תחת קורת גג אחת. 12+ שנות ניסיון, 50+ פרויקטים, 3 פטנטים.";
+export const SITE_TWITTER = "@ProtoModel";
 export const OG_IMAGE = `${SITE_URL}/og-image.jpg`;
 
 /** Build full Next.js Metadata object per page */
@@ -29,7 +30,7 @@ export function buildMeta({
   modifiedTime?: string;
 }) {
   const url = `${SITE_URL}${path}`;
-  const fullTitle = title.includes("NBH") ? title : `${title} | ${SITE_NAME}`;
+  const fullTitle = title.includes("Proto-Model") ? title : `${title} | ${SITE_NAME}`;
 
   return {
     title: fullTitle,
@@ -71,7 +72,7 @@ export const organizationSchema = {
   url: SITE_URL,
   logo: { "@type": "ImageObject", url: `${SITE_URL}/logo.png` },
   description: SITE_DESCRIPTION,
-  email: "nevet@nbh-engineering.com",
+  email: "nevet@proto-model.com",
   address: {
     "@type": "PostalAddress",
     addressCountry: "IL",
