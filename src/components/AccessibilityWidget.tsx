@@ -44,17 +44,21 @@ function applySettings(s: Settings) {
 
 export default function AccessibilityWidget() {
   const [open, setOpen] = useState(false);
-  const [settings, setSettings] = useState<Settings>(defaultSettings);
-
-  useEffect(() => {
+  // Lazy initial state: read from localStorage on mount without setState-in-effect.
+  const [settings, setSettings] = useState<Settings>(() => {
+    if (typeof window === "undefined") return defaultSettings;
     try {
       const saved = localStorage.getItem("proto-model-accessibility");
-      if (saved) {
-        const parsed = JSON.parse(saved) as Settings;
-        setSettings(parsed);
-        applySettings(parsed);
-      }
+      if (saved) return JSON.parse(saved) as Settings;
     } catch {}
+    return defaultSettings;
+  });
+
+  // Apply persisted settings to <html> on mount (DOM side-effect only — no setState).
+  useEffect(() => {
+    applySettings(settings);
+    // Run once on mount; subsequent changes are applied inside `toggle`/`reset`.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const toggle = (key: keyof Settings) => {
