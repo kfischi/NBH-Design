@@ -1,0 +1,53 @@
+name: Outbound — Daily draft generation
+
+on:
+  schedule:
+    # 06:00 UTC = 09:00 Israel time during IDT, 08:00 during IST. Mon–Fri only.
+    - cron: "0 6 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: "Max number of targets to draft for"
+        required: false
+        default: "10"
+      dryRun:
+        description: "If true, do not write to Notion"
+        required: false
+        default: "false"
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger draft generation
+        env:
+          SITE_URL: ${{ secrets.SITE_URL }}
+          OUTBOUND_TRIGGER_SECRET: ${{ secrets.OUTBOUND_TRIGGER_SECRET }}
+          INPUT_LIMIT: ${{ github.event.inputs.limit || '10' }}
+          INPUT_DRY_RUN: ${{ github.event.inputs.dryRun || 'false' }}
+        run: |
+          set -euo pipefail
+          if [ -z "$SITE_URL" ] || [ -z "$OUTBOUND_TRIGGER_SECRET" ]; then
+            echo "::error::Missing SITE_URL or OUTBOUND_TRIGGER_SECRET secret"
+            exit 1
+          fi
+
+          payload=$(printf '{"limit":%s,"dryRun":%s}' "$INPUT_LIMIT" "$INPUT_DRY_RUN")
+          echo "Sending payload: $payload"
+
+          response=$(curl -sS -w '\n%{http_code}' -X POST \
+            "$SITE_URL/api/outbound/generate-drafts" \
+            -H "X-Outbound-Secret: $OUTBOUND_TRIGGER_SECRET" \
+            -H "Content-Type: application/json" \
+            -d "$payload")
+
+          body=$(printf '%s' "$response" | sed '$d')
+          status=$(printf '%s' "$response" | tail -n1)
+
+          echo "HTTP $status"
+          echo "$body"
+
+          if [ "$status" != "200" ]; then
+            echo "::error::generate-drafts returned $status"
+            exit 1
+          fi

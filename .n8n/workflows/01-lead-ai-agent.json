@@ -1,0 +1,261 @@
+{
+  "name": "Proto-Model — Lead AI Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "proto-model-lead-agent",
+        "responseMode": "lastNode",
+        "options": {
+          "rawBody": false
+        }
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook — Receive Lead",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "proto-model-lead-agent"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            { "id": "name",      "name": "name",      "value": "={{ $json.body.name }}",      "type": "string" },
+            { "id": "company",   "name": "company",   "value": "={{ $json.body.company ?? '' }}", "type": "string" },
+            { "id": "phone",     "name": "phone",     "value": "={{ $json.body.phone }}",     "type": "string" },
+            { "id": "challenge", "name": "challenge", "value": "={{ $json.body.challenge }}", "type": "string" },
+            { "id": "timestamp", "name": "timestamp", "value": "={{ $now.toISO() }}",         "type": "string" }
+          ]
+        }
+      },
+      "id": "set-fields",
+      "name": "Extract Lead Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "model": "claude-opus-4-6",
+        "options": {
+          "maxTokens": 1024,
+          "temperature": 0.3
+        },
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "אתה עוזר AI של Proto-Model, חברת הנדסה ישראלית מקצועית. תפקידך לנתח לידים נכנסים ולהפיק תובנות אסטרטגיות.\n\nעבור כל ליד תחזיר JSON בדיוק בפורמט הזה (ללא markdown, רק JSON טהור):\n{\n  \"score\": <מספר 1-10, 10 הכי חם>,\n  \"summary\": \"<סיכום קצר באנגלית של הצורך ההנדסי>\",\n  \"suggestedResponse\": \"<הודעת ווטסאפ פרסונלית בעברית לנבט לשלוח ללקוח>\",\n  \"tags\": [\"<תחום1>\", \"<תחום2>\"],\n  \"urgency\": \"high|medium|low\",\n  \"estimatedProjectSize\": \"small|medium|large|enterprise\"\n}"
+            },
+            {
+              "role": "user",
+              "content": "=ניתח את הליד הבא:\n\nשם: {{ $json.name }}\nחברה: {{ $json.company || 'לא צוין' }}\nטלפון: {{ $json.phone }}\n\nתיאור האתגר:\n{{ $json.challenge }}"
+            }
+          ]
+        }
+      },
+      "id": "claude-analyze",
+      "name": "Claude — Analyze Lead",
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [680, 300],
+      "credentials": {
+        "anthropicApi": {
+          "id": "anthropic-creds",
+          "name": "Anthropic API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const raw = $input.first().json.content ?? $input.first().json.text ?? '';\nlet ai;\ntry {\n  const jsonStr = raw.match(/\\{[\\s\\S]*\\}/)?.[0] ?? '{}';\n  ai = JSON.parse(jsonStr);\n} catch {\n  ai = { score: 5, summary: raw.slice(0, 200), suggestedResponse: '', tags: [], urgency: 'medium', estimatedProjectSize: 'medium' };\n}\n\nconst lead = $('Extract Lead Fields').first().json;\nreturn [{ json: { ...lead, ai } }];"
+      },
+      "id": "parse-ai-result",
+      "name": "Parse AI Result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.WAHA_BASE_URL }}/api/sendText",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type",  "value": "application/json" },
+            { "name": "X-Api-Key",     "value": "={{ $env.WAHA_API_KEY }}" }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "session", "value": "default" },
+            { "name": "chatId",  "value": "={{ $env.WAHA_TO_NUMBER }}@c.us" },
+            {
+              "name": "text",
+              "value": "=🔥 *ליד חדש — ציון AI: {{ $json.ai.score }}/10*\n\n👤 {{ $json.name }}{{ $json.company ? ' · ' + $json.company : '' }}\n📱 {{ $json.phone }}\n⚡ דחיפות: {{ $json.ai.urgency }}\n📦 גודל פרויקט: {{ $json.ai.estimatedProjectSize }}\n\n💡 *תובנת AI:*\n{{ $json.ai.summary }}\n\n💬 *הודעה מוצעת:*\n{{ $json.ai.suggestedResponse }}"
+            }
+          ]
+        },
+        "options": { "timeout": 10000 }
+      },
+      "id": "whatsapp-notify",
+      "name": "WhatsApp — Notify Nevet",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1120, 160],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "url": "https://api.resend.com/emails",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "=Bearer {{ $env.RESEND_API_KEY }}" },
+            { "name": "Content-Type",  "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "from",    "value": "Proto-Model <nevet@proto-model.com>" },
+            { "name": "to",      "value": "={{ $env.EMAIL_TO }}" },
+            { "name": "subject", "value": "=ליד חדש (ציון {{ $json.ai.score }}/10): {{ $json.name }}" },
+            {
+              "name": "html",
+              "value": "=<div dir='rtl' style='font-family:Arial;direction:rtl'><h2>ליד חדש מהאתר</h2><table><tr><td><b>שם:</b></td><td>{{ $json.name }}</td></tr><tr><td><b>חברה:</b></td><td>{{ $json.company || 'לא צוין' }}</td></tr><tr><td><b>טלפון:</b></td><td>{{ $json.phone }}</td></tr></table><hr><h3>האתגר:</h3><p>{{ $json.challenge }}</p><hr><h3>תובנת AI (ציון {{ $json.ai.score }}/10):</h3><p>{{ $json.ai.summary }}</p><p><b>תגים:</b> {{ $json.ai.tags.join(', ') }}</p></div>"
+            }
+          ]
+        },
+        "options": { "timeout": 15000 }
+      },
+      "id": "email-notify",
+      "name": "Email — Lead Summary",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1120, 300],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "url": "https://api.notion.com/v1/pages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization",   "value": "=Bearer {{ $env.NOTION_API_KEY }}" },
+            { "name": "Notion-Version",  "value": "2022-06-28" },
+            { "name": "Content-Type",    "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "parent",
+              "value": "={\"database_id\": \"{{ $env.NOTION_LEADS_DATABASE_ID }}\"}"
+            },
+            {
+              "name": "properties",
+              "value": "={\"Name\":{\"title\":[{\"text\":{\"content\":\"{{ $json.name }}\"}}]},\"Company\":{\"rich_text\":[{\"text\":{\"content\":\"{{ $json.company || '' }}\"}}]},\"Phone\":{\"phone_number\":\"{{ $json.phone }}\"},\"Status\":{\"select\":{\"name\":\"ליד חדש\"}},\"AI Score\":{\"number\":{{ $json.ai.score }}},\"Urgency\":{\"select\":{\"name\":\"{{ $json.ai.urgency }}\"}},\"Tags\":{\"multi_select\":{{ JSON.stringify($json.ai.tags.map(t => ({name: t}))) }}},\"Date\":{\"date\":{\"start\":\"{{ $json.timestamp }}\"}}}"
+            }
+          ]
+        },
+        "options": { "timeout": 15000 }
+      },
+      "id": "notion-crm",
+      "name": "Notion — Create Lead",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1120, 440],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.NEXT_PUBLIC_SITE_URL }}/api/n8n/webhook",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Content-Type",     "value": "application/json" },
+            { "name": "x-webhook-secret", "value": "={{ $env.N8N_WEBHOOK_SECRET }}" }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "type",
+              "value": "lead_processed"
+            },
+            {
+              "name": "lead",
+              "value": "={\"name\":\"{{ $json.name }}\",\"company\":\"{{ $json.company }}\",\"phone\":\"{{ $json.phone }}\",\"challenge\":\"{{ $json.challenge }}\"}"
+            },
+            {
+              "name": "ai",
+              "value": "={{ JSON.stringify($json.ai) }}"
+            },
+            {
+              "name": "timestamp",
+              "value": "={{ $json.timestamp }}"
+            }
+          ]
+        },
+        "options": { "timeout": 15000 }
+      },
+      "id": "callback-nextjs",
+      "name": "Callback — Next.js (commit lead)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1120, 580],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\"ok\":true,\"leadScore\":{{ $('Parse AI Result').first().json.ai.score }},\"message\":\"Lead processed successfully\"}"
+      },
+      "id": "respond",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1340, 300]
+    }
+  ],
+  "connections": {
+    "Webhook — Receive Lead": {
+      "main": [[{ "node": "Extract Lead Fields", "type": "main", "index": 0 }]]
+    },
+    "Extract Lead Fields": {
+      "main": [[{ "node": "Claude — Analyze Lead", "type": "main", "index": 0 }]]
+    },
+    "Claude — Analyze Lead": {
+      "main": [[{ "node": "Parse AI Result", "type": "main", "index": 0 }]]
+    },
+    "Parse AI Result": {
+      "main": [[
+        { "node": "WhatsApp — Notify Nevet",        "type": "main", "index": 0 },
+        { "node": "Email — Lead Summary",            "type": "main", "index": 0 },
+        { "node": "Notion — Create Lead",            "type": "main", "index": 0 },
+        { "node": "Callback — Next.js (commit lead)", "type": "main", "index": 0 }
+      ]]
+    },
+    "WhatsApp — Notify Nevet":         { "main": [[{ "node": "Respond to Webhook", "type": "main", "index": 0 }]] },
+    "Email — Lead Summary":            { "main": [[{ "node": "Respond to Webhook", "type": "main", "index": 0 }]] },
+    "Notion — Create Lead":            { "main": [[{ "node": "Respond to Webhook", "type": "main", "index": 0 }]] },
+    "Callback — Next.js (commit lead)":{ "main": [[{ "node": "Respond to Webhook", "type": "main", "index": 0 }]] }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "tags": ["proto-model", "leads", "ai"],
+  "meta": {
+    "instanceId": "proto-model",
+    "templateCredsSetupCompleted": false
+  }
+}
