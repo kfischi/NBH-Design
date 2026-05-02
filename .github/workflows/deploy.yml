@@ -39,19 +39,19 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          # Pass dummy values so build doesn't fail on missing env
+          # Server-side secrets (empty string if not set — code handles missing config gracefully)
           N8N_WEBHOOK_URL: ${{ secrets.N8N_WEBHOOK_URL }}
           N8N_WEBHOOK_SECRET: ${{ secrets.N8N_WEBHOOK_SECRET }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           WAHA_BASE_URL: ${{ secrets.WAHA_BASE_URL }}
           WAHA_API_KEY: ${{ secrets.WAHA_API_KEY }}
           WAHA_TO_NUMBER: ${{ secrets.WAHA_TO_NUMBER }}
-          HUBSPOT_API_KEY: ${{ secrets.HUBSPOT_API_KEY }}
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
           NOTION_LEADS_DATABASE_ID: ${{ secrets.NOTION_LEADS_DATABASE_ID }}
           NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
-          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
-          NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: ${{ vars.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME }}
+          # Public vars: hardcoded fallback so the build works even before the repo "vars" are configured
+          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL || 'https://proto-model.com' }}
+          NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: ${{ vars.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'placeholder' }}
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4

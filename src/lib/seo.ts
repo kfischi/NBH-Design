@@ -3,7 +3,8 @@
  * Centralized metadata, structured data, and canonical URL helpers.
  */
 
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://proto-model.com";
+// `||` (not `??`) so an empty-string value (CI env without the var set) falls through.
+export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://proto-model.com";
 export const SITE_NAME = "Proto-Model";
 export const SITE_TAGLINE = "מחלום למציאות";
 export const SITE_DESCRIPTION =
