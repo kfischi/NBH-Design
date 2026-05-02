@@ -59,16 +59,29 @@ export function WebGLShader({ fixed = true }: { fixed?: boolean }) {
       }
     `
 
+    const getSize = () => {
+      if (fixed) {
+        return { width: window.innerWidth, height: window.innerHeight }
+      }
+      const parent = canvas.parentElement
+      if (parent) {
+        return { width: parent.clientWidth, height: parent.clientHeight }
+      }
+      return { width: window.innerWidth, height: window.innerHeight }
+    }
+
     const initScene = () => {
+      const { width, height } = getSize()
+
       refs.scene = new THREE.Scene()
-      refs.renderer = new THREE.WebGLRenderer({ canvas })
-      refs.renderer.setPixelRatio(window.devicePixelRatio)
+      refs.renderer = new THREE.WebGLRenderer({ canvas, antialias: false })
+      refs.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
       refs.renderer.setClearColor(new THREE.Color(0x000000))
 
       refs.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, -1)
 
       refs.uniforms = {
-        resolution: { value: [window.innerWidth, window.innerHeight] },
+        resolution: { value: [width, height] },
         time: { value: 0.0 },
         xScale: { value: 1.0 },
         yScale: { value: 0.5 },
@@ -111,19 +124,34 @@ export function WebGLShader({ fixed = true }: { fixed?: boolean }) {
 
     const handleResize = () => {
       if (!refs.renderer || !refs.uniforms) return
-      const width = window.innerWidth
-      const height = window.innerHeight
+      const { width, height } = getSize()
       refs.renderer.setSize(width, height, false)
       ;(refs.uniforms.resolution as { value: number[] }).value = [width, height]
     }
 
     initScene()
     animate()
-    window.addEventListener("resize", handleResize)
+
+    if (fixed) {
+      window.addEventListener("resize", handleResize)
+    } else {
+      const observer = new ResizeObserver(handleResize)
+      if (canvas.parentElement) observer.observe(canvas.parentElement)
+
+      return () => {
+        if (refs.animationId) cancelAnimationFrame(refs.animationId)
+        observer.disconnect()
+        cleanup()
+      }
+    }
 
     return () => {
       if (refs.animationId) cancelAnimationFrame(refs.animationId)
       window.removeEventListener("resize", handleResize)
+      cleanup()
+    }
+
+    function cleanup() {
       if (refs.mesh) {
         refs.scene?.remove(refs.mesh)
         refs.mesh.geometry.dispose()
@@ -133,7 +161,7 @@ export function WebGLShader({ fixed = true }: { fixed?: boolean }) {
       }
       refs.renderer?.dispose()
     }
-  }, [])
+  }, [fixed])
 
   return (
     <canvas

@@ -79,7 +79,16 @@ const cases = [
   },
 ];
 
-type Case = typeof cases[0] & { slug?: string };
+type Case = typeof cases[0] & { slug?: string }
+
+const accentGradients: Record<string, string> = {
+  indigo:  "from-indigo-400 to-indigo-600",
+  rose:    "from-rose-400 to-rose-600",
+  emerald: "from-emerald-400 to-emerald-600",
+  violet:  "from-violet-400 to-violet-600",
+  cyan:    "from-cyan-400 to-cyan-600",
+  amber:   "from-amber-400 to-amber-600",
+}
 
 function CaseCard({ project, index }: { project: Case; index: number }) {
   const ref = useRef(null);
@@ -98,7 +107,7 @@ function CaseCard({ project, index }: { project: Case; index: number }) {
       }`}
     >
       {/* Top gradient strip */}
-      <div className={`absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-${project.accentColor}-400 to-${project.accentColor}-600`} />
+      <div className={`absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r ${accentGradients[project.accentColor] ?? "from-slate-400 to-slate-600"}`} />
 
       <div className={`p-7 flex flex-col h-full ${project.size === "large" ? "md:flex-row gap-8" : ""}`}>
         {/* Left/Top content */}

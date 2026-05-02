@@ -13,7 +13,7 @@ import ProjectChatbot from "@/components/ProjectChatbot";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-slate-50">
       <Header />
       <Hero />
       <StatsCounter />

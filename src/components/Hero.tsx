@@ -28,11 +28,11 @@ export default function Hero() {
         {/* WebGL shader background */}
         <WebGLShader fixed={false} />
 
-        {/* Dark overlay to tone down the shader and improve text readability */}
-        <div className="absolute inset-0 z-10 bg-black/55" />
+        {/* Dark overlay — light enough to keep the shader vivid */}
+        <div className="absolute inset-0 z-10 bg-black/40" />
 
         {/* Desktop overlay: directional gradient */}
-        <div className="absolute inset-0 z-10 hidden lg:block bg-gradient-to-l from-black/70 via-black/30 to-transparent" />
+        <div className="absolute inset-0 z-10 hidden lg:block bg-gradient-to-l from-black/65 via-black/20 to-transparent" />
 
         {/* Bottom vignette */}
         <div className="absolute inset-x-0 bottom-0 z-10 h-40 bg-gradient-to-t from-black/70 to-transparent" />
@@ -148,6 +148,22 @@ export default function Hero() {
           </div>
         </div>
 
+        {/* ── Mobile content inside hero ── */}
+        <div className="lg:hidden relative z-20 w-full px-6 text-center">
+          <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/15 backdrop-blur-md border border-white/30 text-white text-xs font-semibold rounded-full mb-5">
+            <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full inline-block animate-pulse" />
+            הנדסה · תכנון · הדפסה תלת-מימד
+          </span>
+          <h1 className="text-4xl font-black text-white leading-tight tracking-tight mb-3"
+            style={{ textShadow: "0 2px 16px rgba(0,0,0,0.9)" }}>
+            הנדסה רב-תחומית<br />לפתרונות מורכבים
+          </h1>
+          <p className="text-sm text-white/80 mb-4"
+            style={{ textShadow: "0 1px 6px rgba(0,0,0,0.7)" }}>
+            מהרעיון ועד לאב-טיפוס — תכנון מלא עם הדפסת תלת-מימד
+          </p>
+        </div>
+
         {/* Scroll indicator — desktop only */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -166,18 +182,15 @@ export default function Hero() {
         </motion.div>
       </section>
 
-      {/* ── Mobile CTA bar ── */}
-      <div className="lg:hidden bg-slate-900 px-6 py-8 flex flex-col items-center gap-3">
-        <LiquidButton
-          className="w-full text-white border border-white/30 rounded-full justify-center"
-          size="xl"
+      {/* ── Mobile CTA bar (below hero) ── */}
+      <div className="lg:hidden bg-slate-900 px-6 py-6 flex flex-col items-center gap-3">
+        <button
           onClick={openChatbot}
+          className="w-full flex items-center justify-center gap-2.5 px-6 py-4 bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold rounded-full shadow-lg text-base"
         >
-          <span className="flex items-center gap-2.5">
-            דבר עם יועץ AI
-            <ArrowLeft className="w-4 h-4" />
-          </span>
-        </LiquidButton>
+          דבר עם יועץ AI
+          <ArrowLeft className="w-4 h-4" />
+        </button>
         <a
           href="#case-studies"
           onClick={(e) => {

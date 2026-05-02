@@ -127,20 +127,20 @@ export default function Manifesto() {
               <div className="relative">
                 {/* Gradient accent line */}
                 <div
-                  className={`h-0.5 w-12 bg-gradient-to-r ${b.gradient} mb-6 mr-auto`}
+                  className={`h-0.5 w-12 bg-gradient-to-r ${b.gradient} mb-6 ml-auto`}
                 />
 
-                <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-snug mb-4 max-w-3xl mr-auto">
+                <p className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-snug mb-4 max-w-3xl ml-auto">
                   {b.claim}
                 </p>
 
                 <p
-                  className={`text-base sm:text-lg font-semibold mb-4 max-w-2xl mr-auto bg-gradient-to-r ${b.gradient} bg-clip-text text-transparent`}
+                  className={`text-base sm:text-lg font-semibold mb-4 max-w-2xl ml-auto bg-gradient-to-r ${b.gradient} bg-clip-text text-transparent`}
                 >
                   {b.emphasis}
                 </p>
 
-                <p className="text-slate-500 text-sm sm:text-base leading-relaxed max-w-xl mr-auto">
+                <p className="text-slate-500 text-sm sm:text-base leading-relaxed max-w-xl ml-auto">
                   {b.detail}
                 </p>
               </div>
