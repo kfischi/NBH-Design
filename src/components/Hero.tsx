@@ -2,9 +2,8 @@
 
 import { motion } from "framer-motion";
 import { ArrowLeft, Play } from "lucide-react";
-
-const VIDEO_URL =
-  "https://res.cloudinary.com/dptyfvwyo/video/upload/q_auto,f_auto/v1774134044/0321_1_1_sxywcf.mp4";
+import { WebGLShader } from "@/components/ui/web-gl-shader";
+import { LiquidButton } from "@/components/ui/liquid-glass-button";
 
 const containerVariants = {
   hidden: {},
@@ -16,7 +15,6 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" as const } },
 };
 
-/* Open the chatbot from anywhere via a custom event */
 function openChatbot() {
   window.dispatchEvent(new CustomEvent("nbh:open-chatbot"));
 }
@@ -24,25 +22,20 @@ function openChatbot() {
 export default function Hero() {
   return (
     <>
-      {/* ── Video section ── */}
+      {/* ── Hero section ── */}
       <section className="relative h-[58vh] lg:min-h-screen flex items-center overflow-hidden">
 
-        {/* ── Full-screen video ── */}
-        <video
-          src={VIDEO_URL}
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-          className="absolute inset-0 w-full h-full object-cover z-0"
-        />
+        {/* WebGL shader background */}
+        <WebGLShader fixed={false} />
 
-        {/* ── Desktop overlay: directional — very dark right, transparent left ── */}
-        <div className="absolute inset-0 z-10 hidden lg:block bg-gradient-to-l from-black/90 via-black/60 to-black/15" />
+        {/* Dark overlay to tone down the shader and improve text readability */}
+        <div className="absolute inset-0 z-10 bg-black/55" />
+
+        {/* Desktop overlay: directional gradient */}
+        <div className="absolute inset-0 z-10 hidden lg:block bg-gradient-to-l from-black/70 via-black/30 to-transparent" />
 
         {/* Bottom vignette */}
-        <div className="absolute inset-x-0 bottom-0 z-10 h-40 bg-gradient-to-t from-black/60 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 z-10 h-40 bg-gradient-to-t from-black/70 to-transparent" />
 
         {/* Subtle white grid */}
         <div
@@ -59,7 +52,7 @@ export default function Hero() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid lg:grid-cols-2 min-h-screen items-center py-24 lg:py-32">
 
-              {/* Left col — intentionally empty so video shows */}
+              {/* Left col — intentionally empty so shader shows */}
               <div />
 
               {/* Right col — text */}
@@ -104,15 +97,16 @@ export default function Hero() {
 
                   {/* CTAs */}
                   <motion.div variants={itemVariants} className="flex items-center gap-4 flex-wrap">
-                    <motion.button
+                    <LiquidButton
+                      className="text-white border border-white/30 rounded-full"
+                      size="xl"
                       onClick={openChatbot}
-                      className="inline-flex items-center gap-2.5 px-7 py-4 bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold rounded-full shadow-2xl shadow-indigo-500/50 hover:shadow-indigo-500/70 transition-all duration-200 text-base"
-                      whileHover={{ scale: 1.04, y: -2 }}
-                      whileTap={{ scale: 0.97 }}
                     >
-                      דבר עם יועץ AI
-                      <ArrowLeft className="w-4 h-4" />
-                    </motion.button>
+                      <span className="flex items-center gap-2.5">
+                        דבר עם יועץ AI
+                        <ArrowLeft className="w-4 h-4" />
+                      </span>
+                    </LiquidButton>
 
                     <motion.a
                       href="#case-studies"
@@ -121,8 +115,6 @@ export default function Hero() {
                         document.querySelector("#case-studies")?.scrollIntoView({ behavior: "smooth" });
                       }}
                       className="inline-flex items-center gap-2 px-6 py-4 bg-white/12 backdrop-blur-sm text-white font-semibold rounded-full border border-white/30 hover:bg-white/22 transition-all duration-200 text-base"
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
                     >
                       <Play className="w-4 h-4 fill-white/70" />
                       צפה במקרי בוחן
@@ -174,15 +166,18 @@ export default function Hero() {
         </motion.div>
       </section>
 
-      {/* ── Mobile CTA bar — below the video, no titles ── */}
+      {/* ── Mobile CTA bar ── */}
       <div className="lg:hidden bg-slate-900 px-6 py-8 flex flex-col items-center gap-3">
-        <button
+        <LiquidButton
+          className="w-full text-white border border-white/30 rounded-full justify-center"
+          size="xl"
           onClick={openChatbot}
-          className="w-full flex items-center justify-center gap-2.5 px-6 py-4 bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-bold rounded-full shadow-lg text-base"
         >
-          דבר עם יועץ AI
-          <ArrowLeft className="w-4 h-4" />
-        </button>
+          <span className="flex items-center gap-2.5">
+            דבר עם יועץ AI
+            <ArrowLeft className="w-4 h-4" />
+          </span>
+        </LiquidButton>
         <a
           href="#case-studies"
           onClick={(e) => {
