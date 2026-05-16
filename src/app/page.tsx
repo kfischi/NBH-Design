@@ -1,5 +1,6 @@
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
+import TrustStrip from "@/components/TrustStrip";
 import StatsCounter from "@/components/StatsCounter";
 import PainPoints from "@/components/PainPoints";
 import Services from "@/components/Services";
@@ -16,6 +17,7 @@ export default function Home() {
     <main className="min-h-screen bg-white">
       <Header />
       <Hero />
+      <TrustStrip />
       <StatsCounter />
       <PainPoints />
       <Services />
