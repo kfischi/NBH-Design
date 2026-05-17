@@ -62,8 +62,10 @@ export default function RootLayout({
   return (
     <html lang="he" dir="rtl" className="h-full antialiased scroll-smooth">
       <head>
+        <link rel="dns-prefetch" href="//fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="//res.cloudinary.com" />
         {/* Heebo — Google Font מותאם לעברית */}
         <link
           href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap"

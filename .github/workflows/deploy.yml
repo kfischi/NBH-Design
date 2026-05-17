@@ -1,24 +1,28 @@
-name: CI / Deploy
+name: CI
+
+# Build + lint + type check. Deploys are handled natively by Netlify's
+# GitHub integration (Netlify rebuilds on every push to main).
+#
+# History note: this workflow previously tried to deploy via
+# `netlify deploy --dir=.next --prod` which does NOT work for SSR
+# Next.js apps using @netlify/plugin-nextjs — the plugin needs to run
+# during Netlify's own build to transform output into Functions. The
+# deploy + notify-failure jobs were removed; trust Netlify for deploys.
 
 on:
   push:
     branches:
-      - main          # Production deploy → Netlify (prod)
-      - staging       # Preview deploy → Netlify (draft URL)
+      - main
+      - staging
   pull_request:
     branches:
-      - main          # PR checks before merge
-  repository_dispatch:
-    types:
-      - deploy-production   # Triggered by N8N or /api/deploy/trigger
-      - deploy-staging
+      - main
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true   # Cancel stale runs on new push
+  cancel-in-progress: true
 
 jobs:
-  # ── 1. Build & Lint ───────────────────────────────────────────────
   build:
     name: Build & Lint
     runs-on: ubuntu-latest
@@ -36,10 +40,13 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: TypeScript type check
+        run: npx tsc --noEmit
+
       - name: Build
         run: npm run build
         env:
-          # Server-side secrets (empty string if not set — code handles missing config gracefully)
+          # Server-side secrets (empty when unset — code handles missing config gracefully)
           N8N_WEBHOOK_URL: ${{ secrets.N8N_WEBHOOK_URL }}
           N8N_WEBHOOK_SECRET: ${{ secrets.N8N_WEBHOOK_SECRET }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
@@ -49,99 +56,6 @@ jobs:
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
           NOTION_LEADS_DATABASE_ID: ${{ secrets.NOTION_LEADS_DATABASE_ID }}
           NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
-          # Public vars: hardcoded fallback so the build works even before the repo "vars" are configured
+          # Public vars: hardcoded fallback so the build works even before repo Variables are set
           NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL || 'https://proto-model.com' }}
           NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: ${{ vars.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'placeholder' }}
-
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: nextjs-build
-          path: .next/
-          retention-days: 1
-
-  # ── 2. Deploy to Netlify ──────────────────────────────────────────
-  deploy:
-    name: Deploy → Netlify
-    needs: build
-    runs-on: ubuntu-latest
-    # Deploy on push or repository_dispatch (N8N / API trigger) — not on PRs
-    if: github.event_name == 'push' || github.event_name == 'repository_dispatch'
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Download build artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: nextjs-build
-          path: .next/
-
-      - name: Install Netlify CLI
-        run: npm install -g netlify-cli@latest
-
-      # Production deploy (main branch OR N8N dispatch)
-      - name: Deploy to Production
-        if: github.ref == 'refs/heads/main' || github.event.action == 'deploy-production'
-        run: |
-          netlify deploy \
-            --dir=.next \
-            --site=${{ secrets.NETLIFY_SITE_ID }} \
-            --auth=${{ secrets.NETLIFY_AUTH_TOKEN }} \
-            --prod \
-            --message="Deploy from GitHub — ${{ github.sha }}"
-        env:
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-
-      # Preview deploy (staging branch OR N8N dispatch)
-      - name: Deploy Preview (staging)
-        if: github.ref == 'refs/heads/staging' || github.event.action == 'deploy-staging'
-        id: preview
-        run: |
-          OUTPUT=$(netlify deploy \
-            --dir=.next \
-            --site=${{ secrets.NETLIFY_SITE_ID }} \
-            --auth=${{ secrets.NETLIFY_AUTH_TOKEN }} \
-            --message="Preview — ${{ github.sha }}" \
-            --json)
-          echo "deploy_url=$(echo $OUTPUT | jq -r '.deploy_url')" >> $GITHUB_OUTPUT
-
-      - name: Comment Preview URL on commit
-        if: github.ref == 'refs/heads/staging'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            await github.rest.repos.createCommitComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              commit_sha: context.sha,
-              body: `✅ **Preview deployed:** ${{ steps.preview.outputs.deploy_url }}`
-            });
-
-  # ── 3. Notify on failure ──────────────────────────────────────────
-  notify-failure:
-    name: Notify on Failure
-    needs: [build, deploy]
-    if: failure()
-    runs-on: ubuntu-latest
-    steps:
-      - name: Send WhatsApp notification via N8N
-        run: |
-          curl -s -X POST "${{ secrets.N8N_WEBHOOK_URL }}" \
-            -H "Content-Type: application/json" \
-            -H "x-webhook-secret: ${{ secrets.N8N_WEBHOOK_SECRET }}" \
-            -d '{
-              "event": "deploy_failed",
-              "branch": "${{ github.ref_name }}",
-              "commit": "${{ github.sha }}",
-              "run_url": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-            }' || true
