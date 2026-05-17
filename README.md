@@ -1,2 +1,2 @@
-# NBH-Design
-NBH-from idea to design
+# Proto-Model-Design
+Proto-Model-from idea to design

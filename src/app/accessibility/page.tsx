@@ -2,7 +2,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 export const metadata = {
-  title: "הצהרת נגישות | NBH Engineering Solutions",
+  title: "הצהרת נגישות | Proto-Model",
 };
 
 export default function AccessibilityPage() {
@@ -20,7 +20,7 @@ export default function AccessibilityPage() {
 
           <div className="bg-indigo-50 border border-indigo-100 rounded-2xl p-6">
             <p className="text-indigo-900 font-medium">
-              NBH Engineering Solutions מחויבת לנגישות דיגיטלית ולאפשר לכלל המשתמשים — לרבות אנשים עם
+              Proto-Model מחויבת לנגישות דיגיטלית ולאפשר לכלל המשתמשים — לרבות אנשים עם
               מוגבלויות — לגלוש ולהשתמש באתר בצורה מלאה ושוויונית.
             </p>
           </div>
@@ -68,7 +68,7 @@ export default function AccessibilityPage() {
           <section>
             <h2 className="text-xl font-bold text-slate-900 mb-3">מגבלות ידועות</h2>
             <p>
-              חלק מתכני הוידאו עשויים שלא לכלול כתוביות. אנו עובדים על תיקון זה. תוכן המסומן כ"מסווג"
+              חלק מתכני הוידאו עשויים שלא לכלול כתוביות. אנו עובדים על תיקון זה. תוכן המסומן כ&quot;מסווג&quot;
               עשוי להיות מוגבל בטבעו.
             </p>
           </section>
@@ -79,7 +79,7 @@ export default function AccessibilityPage() {
               נתקלת בבעיית נגישות? נשמח לשמוע ולתקן:
             </p>
             <div className="mt-3 space-y-1">
-              <p>📧 <a href="mailto:nevet@nbh-engineering.com" className="text-indigo-600 hover:underline">nevet@nbh-engineering.com</a></p>
+              <p>📧 <a href="mailto:nevet@proto-model.com" className="text-indigo-600 hover:underline">nevet@proto-model.com</a></p>
               <p className="text-sm text-slate-500">נטפל בפנייה תוך 5 ימי עבודה.</p>
             </div>
           </section>

@@ -40,7 +40,7 @@ const timeline = [
   },
   {
     year: "2022",
-    title: "הקמת NBH Engineering",
+    title: "הקמת Proto-Model",
     desc: "ייסוד חברה עצמאית עם חזון ברור: פתרונות הנדסיים מלאים ממקור אחד אחראי.",
     color: "bg-violet-600",
     icon: Rocket,

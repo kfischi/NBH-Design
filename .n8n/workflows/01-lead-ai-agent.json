@@ -1,10 +1,10 @@
 {
-  "name": "NBH — Lead AI Agent",
+  "name": "Proto-Model — Lead AI Agent",
   "nodes": [
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "nbh-lead-agent",
+        "path": "proto-model-lead-agent",
         "responseMode": "lastNode",
         "options": {
           "rawBody": false
@@ -15,7 +15,7 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [240, 300],
-      "webhookId": "nbh-lead-agent"
+      "webhookId": "proto-model-lead-agent"
     },
     {
       "parameters": {
@@ -46,7 +46,7 @@
           "values": [
             {
               "role": "system",
-              "content": "אתה עוזר AI של NBH Engineering Solutions, חברת הנדסה ישראלית מקצועית. תפקידך לנתח לידים נכנסים ולהפיק תובנות אסטרטגיות.\n\nעבור כל ליד תחזיר JSON בדיוק בפורמט הזה (ללא markdown, רק JSON טהור):\n{\n  \"score\": <מספר 1-10, 10 הכי חם>,\n  \"summary\": \"<סיכום קצר באנגלית של הצורך ההנדסי>\",\n  \"suggestedResponse\": \"<הודעת ווטסאפ פרסונלית בעברית לנבט לשלוח ללקוח>\",\n  \"tags\": [\"<תחום1>\", \"<תחום2>\"],\n  \"urgency\": \"high|medium|low\",\n  \"estimatedProjectSize\": \"small|medium|large|enterprise\"\n}"
+              "content": "אתה עוזר AI של Proto-Model, חברת הנדסה ישראלית מקצועית. תפקידך לנתח לידים נכנסים ולהפיק תובנות אסטרטגיות.\n\nעבור כל ליד תחזיר JSON בדיוק בפורמט הזה (ללא markdown, רק JSON טהור):\n{\n  \"score\": <מספר 1-10, 10 הכי חם>,\n  \"summary\": \"<סיכום קצר באנגלית של הצורך ההנדסי>\",\n  \"suggestedResponse\": \"<הודעת ווטסאפ פרסונלית בעברית לנבט לשלוח ללקוח>\",\n  \"tags\": [\"<תחום1>\", \"<תחום2>\"],\n  \"urgency\": \"high|medium|low\",\n  \"estimatedProjectSize\": \"small|medium|large|enterprise\"\n}"
             },
             {
               "role": "user",
@@ -121,7 +121,7 @@
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
-            { "name": "from",    "value": "NBH Engineering <nevet@nbh-engineering.com>" },
+            { "name": "from",    "value": "Proto-Model <nevet@proto-model.com>" },
             { "name": "to",      "value": "={{ $env.EMAIL_TO }}" },
             { "name": "subject", "value": "=ליד חדש (ציון {{ $json.ai.score }}/10): {{ $json.name }}" },
             {
@@ -253,9 +253,9 @@
     "saveManualExecutions": true,
     "callerPolicy": "workflowsFromSameOwner"
   },
-  "tags": ["nbh", "leads", "ai"],
+  "tags": ["proto-model", "leads", "ai"],
   "meta": {
-    "instanceId": "nbh-engineering",
+    "instanceId": "proto-model",
     "templateCredsSetupCompleted": false
   }
 }

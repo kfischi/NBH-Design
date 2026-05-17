@@ -92,7 +92,7 @@ export default function Manifesto() {
                 backgroundClip: "text",
               }}
             >
-              NBH Engineering
+              Proto-Model
             </span>
           </h2>
         </motion.div>

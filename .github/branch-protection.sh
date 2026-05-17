@@ -7,7 +7,7 @@
 #
 #  Usage:
 #    chmod +x .github/branch-protection.sh
-#    GITHUB_REPO=kfischi/NBH-Design ./branch-protection.sh
+#    GITHUB_REPO=kfischi/Proto-Model-Design ./branch-protection.sh
 # ─────────────────────────────────────────────────────────────────────────────
 set -euo pipefail
 

@@ -99,7 +99,7 @@ export default function About() {
                   <h3 className="text-xl font-bold text-slate-900">נבט בן חיים</h3>
                   <p className="text-sm text-indigo-600 font-medium mb-1">Multidisciplinary Product Architect</p>
                   <p className="text-xs text-slate-500">
-                    מנכ&quot;ל ומייסד | NBH Engineering Solutions
+                    מנכ&quot;ל ומייסד | Proto-Model
                   </p>
                   <div className="flex gap-2 mt-3 justify-end">
                     {disciplines.map((d) => {
@@ -127,23 +127,25 @@ export default function About() {
 
               <div className="flex gap-3 justify-end">
                 <motion.a
-                  href="mailto:nevet@nbh-engineering.com"
+                  href="mailto:nevet@proto-model.com"
                   className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium rounded-xl transition-colors"
                   whileHover={{ scale: 1.02 }}
                 >
                   <Mail className="w-4 h-4" />
                   אימייל
                 </motion.a>
-                <motion.a
-                  href="https://linkedin.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-sm font-medium rounded-xl transition-colors"
-                  whileHover={{ scale: 1.02 }}
-                >
-                  <Linkedin className="w-4 h-4" />
-                  LinkedIn
-                </motion.a>
+                {process.env.NEXT_PUBLIC_LINKEDIN_URL ? (
+                  <motion.a
+                    href={process.env.NEXT_PUBLIC_LINKEDIN_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-sm font-medium rounded-xl transition-colors"
+                    whileHover={{ scale: 1.02 }}
+                  >
+                    <Linkedin className="w-4 h-4" />
+                    LinkedIn
+                  </motion.a>
+                ) : null}
               </div>
             </div>
 
@@ -182,7 +184,7 @@ export default function About() {
               <Award className="w-8 h-8 text-indigo-200 mb-4" />
               <h4 className="text-xl font-bold mb-3">הערך הייחודי</h4>
               <p className="text-indigo-100 leading-relaxed text-sm mb-5">
-                רוב חברות ההנדסה מתמחות בתחום אחד. ב-NBH תקבל מענה מלא על כל רכיבי המוצר
+                רוב חברות ההנדסה מתמחות בתחום אחד. ב-Proto-Model תקבל מענה מלא על כל רכיבי המוצר
                 שלך — מהתכנון המכני ועד הפרמוור, כולל ה-PCB שמחבר ביניהם.
               </p>
               <div className="space-y-3">

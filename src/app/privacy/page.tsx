@@ -2,7 +2,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 export const metadata = {
-  title: "מדיניות פרטיות | NBH Engineering Solutions",
+  title: "מדיניות פרטיות | Proto-Model",
 };
 
 export default function PrivacyPage() {
@@ -21,8 +21,8 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-xl font-bold text-slate-900 mb-3">1. כללי</h2>
             <p>
-              NBH Engineering Solutions (להלן: "החברה", "אנחנו") מחויבת לשמירה על פרטיות המשתמשים באתר{" "}
-              <strong>nbh-engineering.com</strong> (להלן: "האתר"). מדיניות פרטיות זו מסבירה אילו מידע אנו
+              Proto-Model (להלן: &quot;החברה&quot;, &quot;אנחנו&quot;) מחויבת לשמירה על פרטיות המשתמשים באתר{" "}
+              <strong>proto-model.com</strong> (להלן: &quot;האתר&quot;). מדיניות פרטיות זו מסבירה אילו מידע אנו
               אוספים, כיצד אנו משתמשים בו, ומהן זכויותיך.
             </p>
           </section>
@@ -74,11 +74,11 @@ export default function PrivacyPage() {
             <ul className="list-disc list-inside space-y-2 mr-4 mt-2">
               <li>לעיין במידע שנאסף עליך</li>
               <li>לבקש תיקון מידע שגוי</li>
-              <li>לבקש מחיקת המידע ("הזכות להישכח")</li>
+              <li>לבקש מחיקת המידע (&quot;הזכות להישכח&quot;)</li>
               <li>להתנגד לעיבוד המידע</li>
             </ul>
             <p className="mt-3">
-              לפניות: <a href="mailto:nevet@nbh-engineering.com" className="text-indigo-600 hover:underline">nevet@nbh-engineering.com</a>
+              לפניות: <a href="mailto:nevet@proto-model.com" className="text-indigo-600 hover:underline">nevet@proto-model.com</a>
             </p>
           </section>
 
@@ -94,8 +94,8 @@ export default function PrivacyPage() {
             <h2 className="text-xl font-bold text-slate-900 mb-3">8. יצירת קשר</h2>
             <p>
               לכל שאלה בנוגע למדיניות פרטיות זו:{" "}
-              <a href="mailto:nevet@nbh-engineering.com" className="text-indigo-600 hover:underline">
-                nevet@nbh-engineering.com
+              <a href="mailto:nevet@proto-model.com" className="text-indigo-600 hover:underline">
+                nevet@proto-model.com
               </a>
             </p>
           </section>

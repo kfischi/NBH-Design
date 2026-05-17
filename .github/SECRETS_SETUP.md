@@ -28,7 +28,7 @@
 
 | Variable Name | Value |
 |---------------|-------|
-| `NEXT_PUBLIC_SITE_URL` | `https://nbh-engineering.com` |
+| `NEXT_PUBLIC_SITE_URL` | `https://proto-model.com` |
 | `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` | שם הענן ב-Cloudinary |
 
 ---

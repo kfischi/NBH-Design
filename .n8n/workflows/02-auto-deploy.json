@@ -1,10 +1,10 @@
 {
-  "name": "NBH — Auto Deploy",
+  "name": "Proto-Model — Auto Deploy",
   "nodes": [
     {
       "parameters": {
         "httpMethod": "POST",
-        "path": "nbh-deploy-production",
+        "path": "proto-model-deploy-production",
         "responseMode": "lastNode",
         "options": {}
       },
@@ -13,7 +13,7 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [240, 300],
-      "webhookId": "nbh-deploy-production"
+      "webhookId": "proto-model-deploy-production"
     },
     {
       "parameters": {
@@ -144,7 +144,7 @@
             { "name": "chatId",  "value": "={{ $env.WAHA_TO_NUMBER }}@c.us" },
             {
               "name": "text",
-              "value": "={{ $json.deployState === 'ready' ? '✅' : '⚠️' }} *NBH Engineering — Deploy {{ $json.deployState === 'ready' ? 'הצליח' : 'סטטוס: ' + $json.deployState }}*\n\n🌐 {{ $json.deployUrl }}\n🕐 {{ $now.toFormat('HH:mm') }}\n📋 ID: {{ $json.deployId }}"
+              "value": "={{ $json.deployState === 'ready' ? '✅' : '⚠️' }} *Proto-Model — Deploy {{ $json.deployState === 'ready' ? 'הצליח' : 'סטטוס: ' + $json.deployState }}*\n\n🌐 {{ $json.deployUrl }}\n🕐 {{ $now.toFormat('HH:mm') }}\n📋 ID: {{ $json.deployId }}"
             }
           ]
         },
@@ -224,8 +224,8 @@
     "executionOrder": "v1",
     "saveManualExecutions": true
   },
-  "tags": ["nbh", "deploy", "automation"],
+  "tags": ["proto-model", "deploy", "automation"],
   "meta": {
-    "instanceId": "nbh-engineering"
+    "instanceId": "proto-model"
   }
 }

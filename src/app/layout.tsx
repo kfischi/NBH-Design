@@ -7,8 +7,8 @@ import { organizationSchema, websiteSchema, SITE_URL } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: {
-    default: "NBH Engineering Solutions | הנדסה רב-תחומית",
-    template: "%s | NBH Engineering Solutions",
+    default: "Proto-Model | הנדסה רב-תחומית",
+    template: "%s | Proto-Model",
   },
   description:
     "פתרונות הנדסיים קצה לקצה — מכניקה, אלקטרוניקה ומיכון. 12+ שנות ניסיון, 50+ פרויקטים, 3 פטנטים. פנה לנבט בן חיים.",
@@ -23,24 +23,24 @@ export const metadata: Metadata = {
     "פיתוח מוצר",
     "אב טיפוס",
     "מהנדס עצמאי ישראל",
-    "NBH Engineering",
+    "Proto-Model",
   ].join(", "),
   authors: [{ name: "נבט בן חיים", url: `${SITE_URL}/about` }],
   creator: "נבט בן חיים",
-  publisher: "NBH Engineering Solutions",
+  publisher: "Proto-Model",
   alternates: { canonical: SITE_URL },
   openGraph: {
-    title: "NBH Engineering Solutions | הנדסה רב-תחומית",
+    title: "Proto-Model | הנדסה רב-תחומית",
     description: "פתרונות הנדסיים מכניקה, אלקטרוניקה ומיכון — תחת קורת גג אחת.",
     type: "website",
     locale: "he_IL",
     url: SITE_URL,
-    siteName: "NBH Engineering Solutions",
-    images: [{ url: `${SITE_URL}/og-image.jpg`, width: 1200, height: 630, alt: "NBH Engineering Solutions" }],
+    siteName: "Proto-Model",
+    images: [{ url: `${SITE_URL}/og-image.jpg`, width: 1200, height: 630, alt: "Proto-Model" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "NBH Engineering Solutions",
+    title: "Proto-Model",
     description: "הנדסה רב-תחומית לפתרונות מורכבים — מכניקה, PCB, IoT, אוטומציה.",
     images: [`${SITE_URL}/og-image.jpg`],
   },
@@ -62,8 +62,10 @@ export default function RootLayout({
   return (
     <html lang="he" dir="rtl" className="h-full antialiased scroll-smooth">
       <head>
+        <link rel="dns-prefetch" href="//fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="//res.cloudinary.com" />
         {/* Heebo — Google Font מותאם לעברית */}
         <link
           href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap"

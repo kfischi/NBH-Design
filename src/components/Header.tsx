@@ -61,10 +61,10 @@ export default function Header() {
                 </div>
                 <div className="flex flex-col leading-none">
                   <span className={`font-bold text-base tracking-tight transition-colors duration-300 ${solid ? "text-slate-900" : "text-white"}`}>
-                    NBH
+                    Proto-Model
                   </span>
-                  <span className={`text-[10px] font-medium tracking-wider uppercase transition-colors duration-300 ${solid ? "text-slate-500" : "text-white/60"}`}>
-                    Engineering
+                  <span className={`text-[10px] font-medium tracking-wider transition-colors duration-300 ${solid ? "text-slate-500" : "text-white/60"}`}>
+                    מחלום למציאות
                   </span>
                 </div>
               </motion.div>

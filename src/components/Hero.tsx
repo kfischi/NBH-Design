@@ -18,7 +18,7 @@ const itemVariants = {
 
 /* Open the chatbot from anywhere via a custom event */
 function openChatbot() {
-  window.dispatchEvent(new CustomEvent("nbh:open-chatbot"));
+  window.dispatchEvent(new CustomEvent("proto-model:open-chatbot"));
 }
 
 export default function Hero() {
@@ -53,6 +53,31 @@ export default function Hero() {
             backgroundSize: "60px 60px",
           }}
         />
+
+        {/* Floating stat cards — desktop only, overlay video at bottom-left */}
+        <div className="absolute bottom-12 left-8 z-20 hidden lg:flex flex-col gap-3">
+          {[
+            { value: "72h", label: "אב-טיפוס ראשון", delay: 1.5 },
+            { value: "30+", label: "פרויקטים הושלמו", delay: 1.65 },
+            { value: "0.1mm", label: "דיוק מרבי", delay: 1.8 },
+          ].map((stat, i) => (
+            <motion.div
+              key={stat.label}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: stat.delay, duration: 0.6, ease: "easeOut" }}
+              className="bg-white/95 backdrop-blur-md border border-white/60 rounded-2xl px-4 py-3 shadow-xl shadow-black/30 flex items-center gap-3"
+              style={{ animation: `float ${4 + i * 0.6}s ease-in-out infinite ${i * 0.8}s` }}
+            >
+              <span className="text-2xl font-black text-slate-900 tabular-nums">
+                {stat.value}
+              </span>
+              <span className="text-xs text-slate-500 font-semibold">
+                {stat.label}
+              </span>
+            </motion.div>
+          ))}
+        </div>
 
         {/* ── Desktop content ── */}
         <div className="hidden lg:block relative z-20 w-full pt-16">
@@ -127,6 +152,17 @@ export default function Hero() {
                       <Play className="w-4 h-4 fill-white/70" />
                       צפה במקרי בוחן
                     </motion.a>
+                  </motion.div>
+
+                  {/* Availability badge */}
+                  <motion.div
+                    variants={itemVariants}
+                    className="flex items-center gap-2 mt-5"
+                  >
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="text-xs text-emerald-300 font-medium">
+                      זמין לפרויקטים חדשים
+                    </span>
                   </motion.div>
 
                   {/* Stats */}

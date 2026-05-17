@@ -2,7 +2,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 export const metadata = {
-  title: "מדיניות עוגיות | NBH Engineering Solutions",
+  title: "מדיניות עוגיות | Proto-Model",
 };
 
 export default function CookiesPage() {
@@ -90,8 +90,8 @@ export default function CookiesPage() {
             <h2 className="text-xl font-bold text-slate-900 mb-3">יצירת קשר</h2>
             <p>
               שאלות לגבי מדיניות עוגיות זו:{" "}
-              <a href="mailto:nevet@nbh-engineering.com" className="text-indigo-600 hover:underline">
-                nevet@nbh-engineering.com
+              <a href="mailto:nevet@proto-model.com" className="text-indigo-600 hover:underline">
+                nevet@proto-model.com
               </a>
             </p>
           </section>

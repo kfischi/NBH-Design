@@ -28,8 +28,8 @@ export function GoogleAnalytics() {
             cookie_flags: 'SameSite=None;Secure'
           });
 
-          // Custom events helper (window.nbhTrack)
-          window.nbhTrack = function(event, params) {
+          // Custom events helper (window.pmTrack)
+          window.pmTrack = function(event, params) {
             gtag('event', event, params || {});
           };
         `}
@@ -42,7 +42,7 @@ export function GoogleTagManager() {
   if (!GTM_ID) return null;
   return (
     <>
-      <Script id="gtm-init" strategy="afterInteractive">
+      <Script id="gtm-init" strategy="lazyOnload">
         {`
           (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
           new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -68,8 +68,8 @@ export function GoogleTagManager() {
 /** Track CTA clicks from anywhere in the app */
 export function trackCTA(label: string) {
   if (typeof window === "undefined") return;
-  if ("nbhTrack" in window) {
-    (window as { nbhTrack: (e: string, p: object) => void }).nbhTrack("cta_click", {
+  if ("pmTrack" in window) {
+    (window as { pmTrack: (e: string, p: object) => void }).pmTrack("cta_click", {
       event_category: "engagement",
       event_label: label,
     });
